@@ -1,0 +1,48 @@
+name: CI/CD Pipeline - HR Multi-Agent System
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-and-verify:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        cache: 'pip'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Ingest and Index Policy Documents
+      run: |
+        python src/rag/ingest.py
+
+    - name: Run Automated Unit and Smoke Tests
+      run: |
+        pytest -v
+
+    - name: Run Evaluation Benchmark Suite
+      run: |
+        python evaluation/run_eval.py
+
+    - name: Verify App Startup & MCP Discovery Smoke Check
+      run: |
+        python -c "
+        from src.mcp.client import MCPClient
+        client = MCPClient(prefer_http=False)
+        tools = client.list_tools()
+        assert len(tools) >= 5, f'Expected at least 5 tools, found {len(tools)}'
+        print(f'Successfully verified {len(tools)} MCP tools!')
+        "

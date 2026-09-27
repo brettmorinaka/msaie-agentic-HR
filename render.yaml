@@ -1,0 +1,30 @@
+services:
+  # Main Web Application & Agent Orchestrator
+  - type: web
+    name: hr-agentic-web
+    env: python
+    buildCommand: "pip install -r requirements.txt && python src/rag/ingest.py"
+    startCommand: "streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: LLM_PROVIDER
+        value: auto
+      - key: MCP_TRANSPORT
+        value: http
+      - key: MCP_SERVER_URL
+        value: http://localhost:8001/mcp
+
+  # Standalone MCP Tool Server (Optional separate service per Requirement 7)
+  - type: web
+    name: hr-mcp-tool-server
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python src/mcp/server.py"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: MCP_SERVER_HOST
+        value: 0.0.0.0
+      - key: MCP_SERVER_PORT
+        value: 8001
