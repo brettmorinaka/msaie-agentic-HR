@@ -10,6 +10,14 @@ An autonomous, multi-agent Human Resources automation system built with **LangGr
 
 ---
 
+## 📚 Project Documentation Index
+
+- **[design-and-evaluation.md](design-and-evaluation.md)**: Comprehensive architectural justification, RAG design, MCP server transport, LangGraph agent orchestration, 8 tool schemas, action-safety guardrails, deployment choices, all 25 benchmark evaluation questions, expected answers, and evaluation results.
+- **[ai-tooling.md](ai-tooling.md)**: Detailed retrospective on AI coding tools utilized (Antigravity IDE / Gemini, AppTest, pytest), what worked well, failure modes encountered (Streamlit re-import caching, package manager constraints), and resolutions.
+- **[deployed.md](deployed.md)**: Live deployment endpoints, `/health` and `/chat` specifications, and free-tier container cold-start behavior notes.
+
+---
+
 ## 🌟 Key Capabilities
 
 1. **Multi-Agent Orchestration (LangGraph):**
@@ -44,6 +52,9 @@ An autonomous, multi-agent Human Resources automation system built with **LangGr
 
 ```
 msaie-agentic-HR/
+├── design-and-evaluation.md        # Architecture, tool schemas & 25-case evaluation report
+├── ai-tooling.md                   # AI tool usage retrospective & debugging analysis
+├── deployed.md                     # Live deployment URLs, health endpoints & cold-start notes
 ├── data/
 │   ├── policies/                   # Multi-format HR policies (.md, .html, .txt)
 │   ├── employees.json              # Synthetic employee directory records
