@@ -25,12 +25,12 @@ STREAMLIT_PORT = int(os.getenv("STREAMLIT_PORT", "8501"))
 
 # LLM Configuration (OpenRouter is the chosen primary LLM provider)
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1/chat/completions")
+OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openrouter" if os.getenv("OPENROUTER_API_KEY") else "auto")
-LLM_MODEL = os.getenv("LLM_MODEL", os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"))
+LLM_MODEL = os.getenv("LLM_MODEL", os.getenv("OPENROUTER_MODEL", "nvidia/nemotron-3.5-lightning:free"))
 
 # RAG & Chunking
 DEFAULT_TOP_K = int(os.getenv("DEFAULT_TOP_K", "3"))
