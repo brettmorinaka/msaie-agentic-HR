@@ -94,6 +94,9 @@ flowchart TD
    - Implements 8 standardized tools exposed over JSON-RPC 2.0 and Streamable HTTP on port `8001` with client-side telemetry logging.
 5. **ChromaDB Local Vector Store (`src/rag/vector_store.py`):**
    - On-disk persistent vector database storing 37 semantic chunks across 5 corporate policy documents.
+6. **Unified LLM Provider Engine (`src/agents/llm_provider.py`):**
+   - Uses **OpenRouter** as the primary LLM provider via `OPENROUTER_API_KEY` and configurable models (e.g., `openai/gpt-4o-mini`, `anthropic/claude-3.5-sonnet`), with a robust local deterministic synthesis fallback for zero-cost offline evaluations.
+
 
 ---
 

@@ -23,12 +23,14 @@ API_HOST = os.getenv("API_HOST", "0.0.0.0")
 API_PORT = int(os.getenv("API_PORT", "8000"))
 STREAMLIT_PORT = int(os.getenv("STREAMLIT_PORT", "8501"))
 
-# LLM Configuration
+# LLM Configuration (OpenRouter is the chosen primary LLM provider)
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1/chat/completions")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "auto")
-LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openrouter" if os.getenv("OPENROUTER_API_KEY") else "auto")
+LLM_MODEL = os.getenv("LLM_MODEL", os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"))
 
 # RAG & Chunking
 DEFAULT_TOP_K = int(os.getenv("DEFAULT_TOP_K", "3"))

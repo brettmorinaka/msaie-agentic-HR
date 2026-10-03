@@ -2,22 +2,41 @@ import os
 import json
 import re
 from typing import Dict, Any, List, Optional
-from src.config import OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_API_KEY, LLM_PROVIDER, LLM_MODEL
+from src.config import (
+    OPENROUTER_API_KEY,
+    OPENROUTER_BASE_URL,
+    OPENAI_API_KEY,
+    ANTHROPIC_API_KEY,
+    GOOGLE_API_KEY,
+    LLM_PROVIDER,
+    LLM_MODEL
+)
 
 class LLMProvider:
     """
-    Unified LLM provider supporting OpenAI, Anthropic, or an intelligent built-in
-    deterministic HR synthesis engine when running without API keys or in offline evaluation mode.
+    Unified LLM provider supporting OpenRouter (primary), OpenAI, Anthropic, or an intelligent
+    built-in deterministic HR synthesis engine when running without API keys or in offline evaluation mode.
     """
 
-    def __init__(self):
-        self.openai_key = OPENAI_API_KEY
-        self.anthropic_key = ANTHROPIC_API_KEY
-        self.google_key = GOOGLE_API_KEY
-        self.model = LLM_MODEL
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        model: Optional[str] = None,
+        provider: Optional[str] = None,
+        base_url: Optional[str] = None
+    ):
+        self.openrouter_key = api_key or os.getenv("OPENROUTER_API_KEY", OPENROUTER_API_KEY)
+        self.openrouter_url = base_url or os.getenv("OPENROUTER_BASE_URL", OPENROUTER_BASE_URL)
+        self.openai_key = os.getenv("OPENAI_API_KEY", OPENAI_API_KEY)
+        self.anthropic_key = os.getenv("ANTHROPIC_API_KEY", ANTHROPIC_API_KEY)
+        self.google_key = os.getenv("GOOGLE_API_KEY", GOOGLE_API_KEY)
+        self.model = model or os.getenv("LLM_MODEL", os.getenv("OPENROUTER_MODEL", LLM_MODEL))
 
-        if LLM_PROVIDER != "auto":
-            self.active_provider = LLM_PROVIDER
+        configured_provider = provider or os.getenv("LLM_PROVIDER", LLM_PROVIDER)
+        if configured_provider != "auto":
+            self.active_provider = configured_provider
+        elif self.openrouter_key:
+            self.active_provider = "openrouter"
         elif self.openai_key:
             self.active_provider = "openai"
         elif self.anthropic_key:
@@ -27,9 +46,43 @@ class LLMProvider:
         else:
             self.active_provider = "mock"
 
+
     def generate(self, prompt: str, system_prompt: str = "") -> str:
         """Generate response using the selected provider."""
-        if self.active_provider == "openai" and self.openai_key:
+        # 1. OpenRouter (Primary Chosen Provider)
+        if self.active_provider == "openrouter" and self.openrouter_key:
+            try:
+                import httpx
+                headers = {
+                    "Authorization": f"Bearer {self.openrouter_key}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://github.com/your-org/msaie-agentic-HR",
+                    "X-Title": "GlobalTech HR Multi-Agent System"
+                }
+                payload = {
+                    "model": self.model,
+                    "messages": [
+                        {"role": "system", "content": system_prompt or "You are the GlobalTech Senior HR Policy Advisor."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    "temperature": 0.0
+                }
+                with httpx.Client(timeout=30.0) as client:
+                    resp = client.post(self.openrouter_url, headers=headers, json=payload)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        choices = data.get("choices", [])
+                        if choices and "message" in choices[0] and "content" in choices[0]["message"]:
+                            content = choices[0]["message"]["content"]
+                            if content:
+                                return content
+                    else:
+                        print(f"[!] OpenRouter API returned HTTP {resp.status_code}: {resp.text}")
+            except Exception as e:
+                print(f"[!] OpenRouter API request failed: {e}; falling back to deterministic synthesis.")
+
+        # 2. OpenAI Fallback
+        elif self.active_provider == "openai" and self.openai_key:
             try:
                 import httpx
                 headers = {"Authorization": f"Bearer {self.openai_key}", "Content-Type": "application/json"}
@@ -48,6 +101,7 @@ class LLMProvider:
             except Exception:
                 pass
 
+        # 3. Built-in Deterministic Synthesis Engine
         return self._deterministic_synthesize(prompt, system_prompt)
 
     def _deterministic_synthesize(self, prompt: str, system_prompt: str) -> str:

@@ -116,7 +116,8 @@ Copy `.env.example` to `.env`:
 ```bash
 cp .env.example .env
 ```
-> *Note:* The system includes an intelligent built-in deterministic HR synthesis engine. If no API key (`OPENAI_API_KEY`) is set, all tests, evaluations, and interactive workflows run 100% locally and reproducibly!
+> *Note:* The system uses **OpenRouter** as its primary LLM provider (set `OPENROUTER_API_KEY=your_key` and `OPENROUTER_MODEL=openai/gpt-4o-mini`). The system also includes an intelligent built-in deterministic HR synthesis engine. If no API key is set, all tests, evaluations, and interactive workflows run 100% locally and reproducibly!
+
 
 ### 3. Ingest Policy Documents into ChromaDB
 ```bash
@@ -260,7 +261,7 @@ The application is pre-configured with `render.yaml`:
 2. Render will automatically detect `render.yaml` and configure:
    - Service: `hr-agentic-web` (Streamlit Web App + LangGraph Orchestrator)
    - Port: `$PORT` (defaults to 8501)
-3. Set environment variable `OPENAI_API_KEY` (optional).
+3. Set environment variable `OPENROUTER_API_KEY` (optional; system falls back to built-in synthesis if omitted).
 4. **Cold-Start Behavior:** On Render's free tier, inactive services spin down after 15 minutes of inactivity. First request will experience a cold-start initialization of ~1-2 seconds while the container resumes.
 
 ### Docker Deployment
