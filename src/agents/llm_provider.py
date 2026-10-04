@@ -45,6 +45,8 @@ class LLMProvider:
             self.active_provider = "google"
         else:
             self.active_provider = "mock"
+        print(f"Using provider: {self.active_provider}")
+        print(f"Using model: {self.model}")
 
 
     def generate(self, prompt: str, system_prompt: str = "") -> str:
