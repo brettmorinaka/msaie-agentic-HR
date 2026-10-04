@@ -11,30 +11,53 @@ from src.rag.chunker import PolicyChunk
 
 class DeterministicFallbackEmbeddingFunction(EmbeddingFunction[Documents]):
     """
-    Deterministic embedding function based on normalized token hashing.
+    Deterministic embedding function based on normalized token hashing with stopword filtering.
     Used if remote model download is unavailable or for ultra-fast deterministic testing.
-    Produces 384-dimensional unit vectors.
+    Produces 768-dimensional unit vectors.
     """
-    def __init__(self, dim: int = 384):
+    STOP_WORDS = {
+        "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "with",
+        "by", "of", "from", "as", "is", "was", "are", "were", "be", "been", "being",
+        "have", "has", "had", "do", "does", "did", "can", "could", "shall", "should",
+        "will", "would", "may", "might", "must", "it", "its", "they", "them", "their",
+        "this", "that", "these", "those", "which", "who", "whom", "what", "where", "when",
+        "why", "how", "all", "any", "both", "each", "few", "more", "most", "other",
+        "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too",
+        "very", "just", "if", "then", "into", "also", "about", "up", "out", "without",
+        "under", "per", "within", "between", "over", "after", "before", "during"
+    }
+
+    def __init__(self, dim: int = 768):
         self.dim = dim
 
     def __call__(self, input: Documents) -> Embeddings:
         embeddings = []
         for text in input:
             vec = [0.0] * self.dim
-            words = text.lower().split()
+            cleaned = text.lower()
+            for ch in [",", ".", ":", ";", "(", ")", "[", "]", "{", "}", '"', "'", "?", "!", "/", "\\", "-", "_"]:
+                cleaned = cleaned.replace(ch, " ")
+            words = cleaned.split()
             if not words:
                 embeddings.append(vec)
                 continue
             for word in words:
-                # 3 different hash seeds to distribute features across dimensions
-                for seed in range(3):
-                    h = int(hashlib.md5(f"{word}_{seed}".encode("utf-8")).hexdigest(), 16)
+                clean_w = word.strip()
+                if not clean_w:
+                    continue
+                if clean_w in self.STOP_WORDS:
+                    weight = 0.01
+                elif len(clean_w) <= 2 and not clean_w.isdigit():
+                    weight = 0.05
+                else:
+                    weight = 1.0
+
+                for seed in range(4):
+                    h = int(hashlib.md5(f"{clean_w}_{seed}".encode("utf-8")).hexdigest(), 16)
                     idx = h % self.dim
                     sign = 1.0 if ((h >> 16) & 1) else -1.0
-                    vec[idx] += sign
+                    vec[idx] += sign * weight
 
-            # Normalize to unit length
             norm = math.sqrt(sum(x * x for x in vec))
             if norm > 0:
                 vec = [x / norm for x in vec]

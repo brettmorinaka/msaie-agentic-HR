@@ -86,7 +86,7 @@ msaie-agentic-HR/
 │   ├── eval_dataset.json           # 25 benchmark evaluation test cases
 │   ├── run_eval.py                 # Evaluation benchmark runner & ablation study
 │   └── results.md                  # Comprehensive evaluation results report
-├── tests/                          # 18 automated unit and integration tests
+├── tests/                          # 25 automated unit and integration tests
 ├── .github/workflows/ci.yml        # GitHub Actions CI/CD pipeline
 ├── Dockerfile                      # Container build definition
 ├── render.yaml                     # Render.com deployment manifest
@@ -123,7 +123,7 @@ cp .env.example .env
 ```bash
 python src/rag/ingest.py
 ```
-*Output:* Indexes 37 chunks across 5 multi-format documents into `chroma_db/`.
+*Output:* Indexes 152 chunks across 11 comprehensive multi-format documents (16,538 words, ~55 standard pages) into `chroma_db/`.
 
 ---
 
@@ -213,7 +213,7 @@ curl -X POST http://localhost:8000/chat \
 
 ## 🧪 Testing & CI/CD Pipeline
 
-Run the complete automated test suite (18 unit and integration tests):
+Run the complete automated test suite (25 unit and integration tests):
 ```bash
 pytest -v
 ```

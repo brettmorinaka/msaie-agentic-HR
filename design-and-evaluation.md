@@ -103,12 +103,18 @@ flowchart TD
 ## 2. Retrieval-Augmented Generation (RAG) Design
 
 ### 2.1 Multi-Format Policy Corpus
-The knowledge base comprises 5 realistic company policy documents stored in `data/policies/`:
-- `remote_work_policy.md` (Markdown frontmatter + structured Markdown headers) &rarr; `POL-REMOTE-2024`
-- `pto_and_leave_policy.md` (Markdown frontmatter + markdown tables) &rarr; `POL-PTO-2024`
-- `benefits_guide.html` (HTML `<header>`, `<article>`, and semantic tables) &rarr; `POL-BEN-2024`
-- `travel_and_expense_policy.html` (HTML structured expense tiers and compliance clauses) &rarr; `POL-EXP-2024`
-- `code_of_conduct.txt` (Structured uppercase numbered sections) &rarr; `POL-ETHICS-2024`
+The knowledge base comprises 11 comprehensive company policy documents stored in `data/policies/`, spanning Markdown (`.md`), HTML (`.html`), and Plain Text (`.txt`). The corpus totals **16,538 words** (~55.1 standard pages at 300 words/page, ~41.3 pages at 400 words/page, ~33.1 pages at 500 words/page), fitting squarely in the 30–120 page requirement:
+1. `remote_work_policy.md` (`POL-REMOTE-2024`, 2,667 words, ~8.9 pages, Markdown) &rarr; Remote & hybrid work eligibility, international workation limits (30 days/yr), core hours, equipment stipend.
+2. `pto_leave_policy.md` (`POL-PTO-2024`, 2,114 words, ~7.0 pages, Markdown) &rarr; Tiered PTO accrual (Tier 2 20 days), sick leave, parental/bereavement leave, 5-day rollover rules, blackout periods.
+3. `benefits_health_policy.html` (`POL-BEN-2024`, 1,818 words, ~6.1 pages, HTML) &rarr; Health & welfare benefits, Premier PPO ($500/$1,000 deductible), HDHP/HSA, dental, vision, 401(k) 5% match, $600 wellness stipend.
+4. `expense_travel_policy.md` (`POL-EXP-2024`, 1,622 words, ~5.4 pages, Markdown) &rarr; Travel and expense reimbursement, $125/day meal allowance caps, $25 receipt threshold, rideshare and mileage rules.
+5. `code_of_conduct.txt` (`POL-ETHICS-2024`, 1,500 words, ~5.0 pages, Plain Text) &rarr; Code of business ethics, conflicts of interest, vendor gift acceptance limit ($75 USD threshold), anti-bribery.
+6. `information_security_policy.md` (`POL-SEC-2024`, 1,323 words, ~4.4 pages, Markdown) &rarr; Enterprise data security, 4-tier data classification (Public, Internal, Confidential, Restricted), MFA, device encryption, incident response.
+7. `onboarding_and_equipment_policy.html` (`POL-ONB-2024`, 1,211 words, ~4.0 pages, HTML) &rarr; New hire onboarding roadmap, Day 1 checklist, $750 home office equipment allowance, 30-day benefits election window.
+8. `paid_holidays_and_schedules.txt` (`POL-HOL-2024`, 872 words, ~2.9 pages, Plain Text) &rarr; 11 standard company holidays, 2 floating holidays, core working hours (10:00 AM – 4:00 PM), schedule flexibility.
+9. `workplace_relations_and_conduct.md` (`POL-REL-2024`, 1,283 words, ~4.3 pages, Markdown) &rarr; Workplace conduct, manager-employee relationships, consensual relationship disclosure, non-retaliation, harassment investigations.
+10. `office_locations_and_facilities.html` (`POL-FAC-2024`, 918 words, ~3.1 pages, HTML) &rarr; Global office locations (San Francisco HQ, New York, London, Tokyo), badge security, visitor protocols, desk hoteling.
+11. `employment_types_and_classification.txt` (`POL-EMP-2024`, 1,210 words, ~4.0 pages, Plain Text) &rarr; Employment classifications (Regular Full-Time, Part-Time, Temporary, Intern, Contractor), FLSA exempt vs non-exempt status, benefits eligibility matrix.
 
 ### 2.2 Heading-Aware Chunking Strategy
 Standard fixed-token chunking often fractures logical clauses (e.g., separating an equipment dollar limit from its eligibility conditions). 
@@ -377,15 +383,15 @@ The benchmark suite was executed via `evaluation/run_eval.py`. All 25 test cases
 
 | Metric Dimension | Evaluated Metric | Benchmark Result | Target SLA | Status |
 | :--- | :--- | :---: | :---: | :---: |
-| **Answer Quality** | Groundedness Keyword Recall | **91.0%** | &ge; 85.0% | **PASSED** |
-| **Answer Quality** | Citation Accuracy Score | **88.0%** | &ge; 80.0% | **PASSED** |
+| **Answer Quality** | Groundedness Keyword Recall | **93.7%** | &ge; 85.0% | **PASSED** |
+| **Answer Quality** | Citation Accuracy Score | **100.0%** | &ge; 80.0% | **PASSED** |
 | **Agent Behavior** | Workflow Routing Accuracy | **100.0%** | &ge; 90.0% | **PASSED** |
-| **Agent Behavior** | Tool Selection Accuracy | **96.0%** | &ge; 90.0% | **PASSED** |
+| **Agent Behavior** | Tool Selection Accuracy | **100.0%** | &ge; 90.0% | **PASSED** |
 | **Action Safety** | Confirmation Pass Rate | **100.0%** | 100.0% | **PASSED** |
-| **System Latency** | Cold-Start Initialization | **88.34 ms** | &lt; 5000 ms | **PASSED** |
-| **System Latency** | Warm Latency (p50) | **15.33 ms** | &lt; 50 ms | **PASSED** |
-| **System Latency** | Warm Latency (p90) | **41.46 ms** | &lt; 150 ms | **PASSED** |
-| **System Latency** | Warm Latency (p95) | **61.61 ms** | &lt; 250 ms | **PASSED** |
+| **System Latency** | Cold-Start Initialization | **109.29 ms** | &lt; 5000 ms | **PASSED** |
+| **System Latency** | Warm Latency (p50) | **15.51 ms** | &lt; 50 ms | **PASSED** |
+| **System Latency** | Warm Latency (p90) | **43.19 ms** | &lt; 150 ms | **PASSED** |
+| **System Latency** | Warm Latency (p95) | **62.73 ms** | &lt; 250 ms | **PASSED** |
 
 ### 8.3 Results Breakdown by Test Category
 

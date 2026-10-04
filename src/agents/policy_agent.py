@@ -27,8 +27,8 @@ class PolicyRAGAgent:
         q_lower = query.lower()
         if ("pto" in q_lower or "vacation" in q_lower) and ("expense" in q_lower or "meal" in q_lower) and ("remote" in q_lower or "workation" in q_lower):
             subqueries = [
-                "temporary international remote work workation policy limit",
-                "non-reimbursable travel expenses during PTO workation"
+                "temporary international remote work workation policy 30 days limit",
+                "strictly non reimbursable expenditures travel expense meals"
             ]
         elif ("stipend" in q_lower or "allowance" in q_lower) and "remote" in q_lower:
             subqueries = ["home office equipment allowance stipend for remote work"]

@@ -2,33 +2,94 @@ GLOBALTECH CODE OF BUSINESS ETHICS AND WORKPLACE CONDUCT
 Document ID: POL-ETHICS-2024
 Category: Compliance & Ethics
 Effective Date: January 1, 2024
-Audience: All GlobalTech Staff, Contractors, and Officers
+Last Revised: March 1, 2024
+Audience: All GlobalTech Staff, Officers, Board Members, Contractors, and Third-Party Partners
+Policy Owner: Office of the Chief Legal Officer & Corporate Compliance Committee
 
 1. PURPOSE AND CORE VALUES
-GlobalTech is dedicated to fostering a professional, inclusive, safe, and respectful environment. Every employee, contractor, officer, and director is expected to uphold the highest ethical standards of integrity, transparency, and accountability in all business activities.
+GlobalTech is dedicated to building transformative technology while fostering an inclusive, lawful, safe, and ethically uncompromising workplace. Every employee, executive officer, director, and independent contractor is expected to uphold the highest ethical standards of integrity, transparency, fairness, and accountability in every business activity, commercial transaction, and professional interaction. 
+
+Our ethical foundation is anchored by four fundamental corporate values:
+1. Integrity First: We do what is right, not what is expedient. We honor our commitments to customers, shareholders, and colleagues.
+2. Respect and Inclusion: We celebrate cognitive diversity, treat every individual with dignity, and reject all forms of bias, prejudice, and mistreatment.
+3. Customer Trust & Fiduciary Stewardship: We protect customer data with military-grade discipline and safeguard corporate assets with uncompromising responsibility.
+4. Transparency & Accountability: We communicate openly, own our mistakes, and address ethical ambiguities proactively.
 
 2. EQUAL OPPORTUNITY AND ANTI-HARASSMENT POLICY
-GlobalTech maintains a zero-tolerance policy regarding discrimination, harassment, retaliation, or bullying in any form. Unlawful discrimination based on race, color, religion, sex, gender identity, sexual orientation, pregnancy, national origin, age, disability, veteran status, or genetic information is strictly prohibited.
-- Prohibited harassment includes unwelcome verbal remarks, offensive slurs, derogatory jokes, unwelcome romantic advances, and visual displays of offensive material.
-- Supervisors and managers who observe or receive reports of harassment are strictly required to report the matter to People Operations within 24 hours.
+GlobalTech is an Equal Opportunity Employer. We maintain a strict zero-tolerance policy regarding any discrimination, unlawful harassment, retaliation, or workplace bullying. 
+
+2.1 Protected Characteristics and Prohibited Discrimination
+Employment decisions at GlobalTech—including hiring, compensation, promotion, assignment, training, and termination—are based solely on individual qualifications, merit, performance, and business necessity. Unlawful discrimination based on race, color, religious creed, sex, gender, gender identity, gender expression, transgender status, sexual orientation, marital status, pregnancy, childbirth, breastfeeding, national origin, ancestry, citizenship, age (40 and older), physical or mental disability, medical condition, genetic information, military or veteran status, or any other characteristic protected by federal, state, or municipal law is strictly prohibited.
+
+2.2 Prohibition of Workplace Harassment and Bullying
+Harassment in any form—verbal, physical, visual, psychological, or sexual—undermines our collaborative culture and will not be tolerated. 
+- Prohibited verbal harassment includes: offensive slurs, derogatory epithets, demeaning comments regarding appearance or background, offensive jokes, unwanted romantic advances, or persistent unwelcome propositions.
+- Prohibited visual harassment includes: offensive posters, cartoons, derogatory memes, explicit computer wallpapers, or sexually suggestive Slack messages/emojis.
+- Prohibited physical harassment includes: unwelcome touching, blocking movement, physical intimidation, or assault.
+- Workplace bullying: systematic, malicious behavior intended to demean, humiliate, or sabotage a colleague's professional standing is strictly prohibited.
+
+2.3 Mandatory Manager Reporting Obligation (Within 24 Hours)
+Supervisors, engineering managers, directors, and executives who observe, suspect, or receive a formal or informal complaint of discrimination, harassment, or retaliation are strictly required by corporate policy to report the full details to People Operations within twenty-four (24) hours. Failure of a manager to report harassment is a serious disciplinary violation resulting in suspension or termination of supervisory authority.
 
 3. REPORTING PROCEDURES AND NON-RETALIATION GUARANTEE
-Employees who experience or witness potential violations of this Code have multiple reporting channels:
-1. Direct Supervisor or Department Head.
-2. People Operations (HR) via email to ethics@globaltech-hr.internal or by filing a confidential HR ticket.
-3. GlobalTech Ethics Helpline: An independent, anonymous 24/7 hotline available online at ethics.globaltech.internal or by phone at 1-800-555-GT-ETHIC.
-GlobalTech guarantees that no employee will suffer retaliation, adverse employment action, demotion, or harassment as a result of making a good-faith report of unethical conduct or participating in an internal investigation.
+GlobalTech provides multiple independent, confidential, and accessible channels for employees to report concerns, seek guidance, or disclose suspected misconduct:
+
+3.1 Reporting Channels
+1. Direct Management Hierarchy: An employee is encouraged to speak directly with their immediate manager, department head, or functional vice president.
+2. People Operations (HR): Employees may contact their designated People Partner or email the Corporate Employee Relations team at ethics@globaltech-hr.internal.
+3. Legal & Compliance Counsel: Reports may be submitted directly to the Office of the Chief Legal Officer at legal-compliance@globaltech.internal.
+4. Independent 24/7 Global Ethics Helpline:
+   - Dedicated Phone Line: 1-800-555-GT-ETHIC (Toll-Free, 24/7/365, multilingual translation available).
+   - Secure Online Portal: ethics.globaltech.internal (or globaltech.ethicspoint.com).
+   - Complete Anonymity: The helpline is operated by an independent third-party provider. Reporters may elect to remain 100% anonymous, communicating via secure case tracking numbers.
+
+3.2 Investigation Protocols and Due Process
+All reports received by People Operations or Legal are logged and evaluated promptly. Investigations are conducted thoroughly, impartially, and with the utmost confidentiality practicable. All participating parties are treated with dignity, and appropriate remedial action—ranging from mandatory coaching and written reprimands to immediate termination—is enacted upon substantiated findings.
+
+3.3 Comprehensive Non-Retaliation Guarantee
+GlobalTech guarantees that no employee will suffer retaliation, discharge, demotion, suspension, threat, harassment, or discrimination as a result of making a good-faith report of suspected unethical conduct, law violations, accounting discrepancies, or participating in an internal or regulatory investigation. Any supervisor or colleague who retaliates against a reporting party will face immediate disciplinary termination.
 
 4. CONFLICTS OF INTEREST AND SECONDARY EMPLOYMENT
-Employees must avoid any interest, investment, or relationship that conflicts or appears to conflict with the best interests of GlobalTech.
-- Moonlighting / Secondary Employment: Secondary employment or advisory roles are permitted only if they do not interfere with performance, do not use company property or confidential IP, and have received prior written sign-off from the Department Vice President and Chief Legal Officer.
-- Employment with direct competitors or vendors providing services to GlobalTech is strictly prohibited.
+
+4.1 Identification of Conflicts
+A conflict of interest arises whenever an employee's personal interests, outside relationships, investments, or activities interfere, or appear to interfere, with their ability to exercise objective, unbiased professional judgment on behalf of GlobalTech.
+
+4.2 Secondary Employment, Moonlighting, and Advisory Roles
+- Secondary employment, freelance consulting, board advisory seats, and entrepreneurial ventures are permitted ONLY under the following strict conditions:
+  1. The outside work must be performed entirely outside of regular working hours.
+  2. The outside work must not utilize any GlobalTech equipment (including laptops, monitors, or phones), software licenses, APIs, or internal intellectual property.
+  3. The outside venture must not compete with GlobalTech or provide services to any direct commercial competitor.
+  4. Mandatory Prior Approval: The employee must submit an Outside Activity Disclosure Form and obtain prior written authorization from both their Department Vice President and the Chief Legal Officer before commencing secondary work.
+- Employment or paid advisory services with any commercial competitor, major vendor, or enterprise customer of GlobalTech is strictly barred.
+
+4.3 Financial Interests and Personal Relationships
+- Employees may not hold a significant financial interest (greater than 1% equity ownership) in any enterprise vendor, customer, or competitor without formal disclosure to Corporate Compliance.
+- Managing, supervising, or participating in employment decisions (hiring, compensation, reviews) regarding immediate family members or romantic partners is strictly forbidden under our Anti-Nepotism standards.
 
 5. GIFTS, ENTERTAINMENT, AND ANTI-BRIBERY
-- Modest Gifts: Modest business meals and promotional items (e.g., logo merchandise) with an aggregate value under $75 USD per occasion may be accepted without prior disclosure.
-- Prohibited Gifts: Cash or cash-equivalents (gift cards, prepaid debit cards) in any amount are strictly prohibited.
-- Gifts or entertainment exceeding $75 USD must be declared in writing to the Corporate Compliance Officer for formal review.
-- Bribery and Kickbacks: Providing or accepting anything of value to influence official action or commercial transactions violates the US Foreign Corrupt Practices Act (FCPA) and is cause for immediate termination with cause.
 
-6. CONFIDENTIAL INFORMATION AND INTELLECTUAL PROPERTY
-Employees must preserve the confidentiality of proprietary information, trade secrets, algorithms, customer lists, and financial figures. This duty continues indefinitely following termination of employment.
+5.1 Modest Business Gifts ($75 USD Disclosure Threshold)
+To avoid the appearance of improper influence or corrupt inducement:
+- Modest Gifts: Modest business meals, seasonal promotional items, and low-value branded merchandise (e.g., pens, t-shirts, notebooks) with an aggregate market value under seventy-five dollars ($75.00 USD) per occasion may be accepted from vendors or partners without prior declaration.
+- Prohibited Cash Gifts: Cash, currency equivalents (including gift cards, prepaid Visa/Mastercard cards, cryptocurrency, or stock equity) are strictly prohibited in any amount.
+- Declaration Threshold: Any gift, hospitality, entertainment invitation, or dining exceeding $75.00 USD in value must be declared in writing to the Corporate Compliance Officer using the online Gift Disclosure Registry. The Compliance Officer will determine whether the item may be retained, shared with the broader team, or politely returned.
+
+5.2 Anti-Bribery, Anti-Corruption, and Foreign Corrupt Practices Act (FCPA)
+GlobalTech strictly complies with the United States Foreign Corrupt Practices Act (FCPA), the UK Bribery Act 2010, and all applicable international anti-corruption statutes:
+- Employees, agents, and distributors are strictly prohibited from directly or indirectly offering, giving, soliciting, or receiving anything of value (money, gifts, hospitality, employment promises) to any government official, public officer, or commercial decision-maker to obtain or retain business or secure an improper commercial advantage.
+- Facilitation Payments ("grease payments"): Routine payments to speed up clerical government actions are strictly prohibited worldwide.
+
+6. PROTECTION OF COMPANY ASSETS AND INTELLECTUAL PROPERTY
+- Stewardship of Corporate Property: Company computers, software, network infrastructure, and physical assets are provided solely for lawful corporate business purposes. Incidental personal use is permitted provided it does not compromise security, violate policies, or diminish productivity.
+- Proprietary Algorithms and Source Code: All source code, product roadmaps, algorithms, architectural designs, customer lists, and financial forecasts created during employment are the exclusive intellectual property of GlobalTech.
+- Third-Party Intellectual Property: We respect the intellectual property rights of competitors, vendors, and open-source communities. Incorporating proprietary code from prior employers or unlicensed third parties into GlobalTech repositories is strictly prohibited.
+
+7. INSIDER TRADING AND HANDLING MATERIAL NON-PUBLIC INFORMATION (MNPI)
+- Definition of MNPI: Material Non-Public Information is any information that a reasonable investor would consider important in deciding whether to buy, hold, or sell securities, which has not been disseminated to the general public (e.g., unannounced quarterly earnings, major acquisitions, security breaches, executive leadership transitions).
+- Trading Restrictions: Employees in possession of MNPI concerning GlobalTech or our business partners are prohibited from trading securities or "tipping" friends, relatives, or acquaintances.
+- Insider trading is a serious federal felony carrying severe civil fines and criminal imprisonment. Designated officers and insiders must trade solely during pre-approved open trading windows under Rule 10b5-1 trading plans.
+
+8. WORKPLACE HEALTH, SAFETY, AND SUBSTANCE-FREE ENVIRONMENT
+- Safe Environment: GlobalTech is dedicated to maintaining safe, healthy, and hazard-free facilities. Employees must comply with all posted safety protocols, fire regulations, and ergonomic standards.
+- Substance-Free Workplace: The possession, sale, distribution, or consumption of illegal drugs or the unauthorized consumption of alcohol during working hours or within company offices is strictly forbidden. Operating machinery or conducting work while impaired is grounds for immediate termination.
+- Workplace Violence: Acts or threats of physical violence, intimidation, stalking, harassment, or the possession of firearms and weapons on GlobalTech property are zero-tolerance offenses resulting in immediate removal and law enforcement engagement.

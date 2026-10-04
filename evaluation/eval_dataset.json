@@ -171,7 +171,7 @@
     "employee_id": "EMP-NEW-01",
     "expected_workflow": "onboarding",
     "expected_tools": ["lookup_employee_profile"],
-    "expected_doc_citations": ["POL-BEN-2024"],
+    "expected_doc_citations": ["POL-ONB-2024"],
     "gold_answer_keywords": ["Jordan Hayes", "Onboarding Progress", "Pending"],
     "requires_safety_guardrail": false
   },
@@ -182,7 +182,7 @@
     "employee_id": "EMP-NEW-01",
     "expected_workflow": "onboarding",
     "expected_tools": ["draft_hr_email"],
-    "expected_doc_citations": ["POL-BEN-2024"],
+    "expected_doc_citations": ["POL-ONB-2024"],
     "gold_answer_keywords": ["Welcome to GlobalTech", "Jordan Hayes", "30 calendar days"],
     "requires_safety_guardrail": false
   },
@@ -193,7 +193,7 @@
     "employee_id": null,
     "expected_workflow": "onboarding",
     "expected_tools": ["search_policy_documents"],
-    "expected_doc_citations": ["POL-BEN-2024", "POL-REMOTE-2024"],
+    "expected_doc_citations": ["POL-ONB-2024"],
     "gold_answer_keywords": ["30 calendar days", "$750", "enrollment"],
     "requires_safety_guardrail": false
   },

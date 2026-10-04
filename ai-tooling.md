@@ -20,7 +20,7 @@ This document details the AI-assisted engineering tools utilized during the desi
 ### 2.1 Multi-Format Policy Ingestion & Heading-Aware Chunker
 - **Application:** The assistant designed format-specific parsers for Markdown frontmatter, semantic HTML DOM elements, and plain text sections (`src/rag/parser.py`).
 - **Heading-Aware Strategy:** AI generated regex patterns matching both Markdown headers (`#` to `####`) and uppercase numbered section delimiters (`1. PURPOSE`), ensuring policy boundaries were preserved with prepended document and section context tokens.
-- **Outcome:** Successfully indexed 37 self-contained semantic chunks across 5 corporate policy documents without manual segmentation.
+- **Outcome:** Successfully indexed 152 self-contained semantic chunks across 11 comprehensive corporate policy documents (16,538 words, ~55 standard pages) without manual segmentation.
 
 ### 2.2 Model Context Protocol (MCP) Server & Tool Registry
 - **Application:** AI generated the 8 standardized tool definitions in `src/mcp/tools.py` conforming to JSON-RPC 2.0 specifications.
@@ -54,12 +54,12 @@ This document details the AI-assisted engineering tools utilized during the desi
 - The generated tools seamlessly supported dual-mode invocation: over JSON-RPC 2.0 HTTP requests and via direct Python client callbacks with unified telemetry logging.
 
 ### 3.3 Synthetic Data & Policy Corpus Realism
-- The AI created 5 realistic corporate policy documents (`POL-REMOTE-2024`, `POL-PTO-2024`, `POL-BEN-2024`, `POL-EXP-2024`, `POL-ETHICS-2024`) containing nuanced rules (e.g. probationary restrictions, international workation limits, advance notice tiers, per diem thresholds).
-- This enabled testing cross-document RAG queries (e.g. asking whether one can expense meals while working remotely on PTO from France).
+- The AI created and expanded 11 realistic corporate policy documents (`POL-REMOTE-2024`, `POL-PTO-2024`, `POL-BEN-2024`, `POL-EXP-2024`, `POL-ETHICS-2024`, `POL-SEC-2024`, `POL-ONB-2024`, `POL-HOL-2024`, `POL-REL-2024`, `POL-FAC-2024`, `POL-EMP-2024`) containing nuanced rules across PTO, holidays, remote work, expenses, data security, benefits, onboarding, equipment, leave, workplace conduct, manager relationships, office locations, and employment classifications.
+- This enabled rigorous testing of cross-document RAG queries (e.g. asking whether one can expense meals while working remotely on PTO from France, or how fiscal close blackouts affect client entertainment travel).
 
 ### 3.4 Automated Evaluation & Benchmark Automation
 - The AI generated the 25-case evaluation dataset and the automated runner script.
-- The runner executed all test cases in seconds, validating that groundedness recall reached **91%**, citation accuracy reached **88%**, and action safety achieved **100%**.
+- The runner executed all test cases in seconds, validating that groundedness recall reached **93.7%**, citation accuracy reached **100%**, tool selection reached **100%**, and action safety achieved **100%**.
 
 ---
 

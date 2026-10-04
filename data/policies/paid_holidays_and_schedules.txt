@@ -1,0 +1,72 @@
+GLOBALTECH CORPORATE PAID HOLIDAYS AND WORK SCHEDULES POLICY
+Document ID: POL-HOL-2024
+Category: Workplace Schedules & Paid Holidays
+Effective Date: January 1, 2024
+Last Revised: February 15, 2024
+Audience: All Regular Full-Time and Part-Time GlobalTech Employees
+Policy Owner: People Operations & Global Total Rewards
+
+1. PURPOSE AND OPERATIONAL PHILOSOPHY
+GlobalTech recognizes the vital importance of predictable work-life rhythms, cultural celebrations, civic commemorations, and regular rest intervals. This policy defines our standard working hours, enterprise core collaboration windows, official corporate paid holidays, floating holiday allocations, weekend holiday observance rules, and flexible scheduling frameworks.
+
+2. STANDARD WORK SCHEDULES AND CORE HOURS
+
+2.1 Standard Workweek and Hours
+The standard workweek for regular full-time exempt and non-exempt employees consists of forty (40) hours per week, typically structured as five (5) eight-hour business days, Monday through Friday. 
+
+2.2 Enterprise Core Collaboration Hours (10:00 AM to 4:00 PM)
+To maintain real-time collaboration across our geographically distributed engineering pods and functional business units, GlobalTech enforces core collaboration hours between 10:00 AM and 4:00 PM within each team's primary designated time zone.
+- During these core collaboration hours, team members are expected to be available for synchronous video conferences, sprint planning, client presentations, and urgent production support.
+- Outside of core hours, employees maintain flexibility to structure their remaining daily work hours to accommodate personal preferences, commuting schedules, or family care.
+
+2.3 Alternative and Flexible Work Arrangements
+- Employees in good standing may request alternative working schedules—such as a 9/80 compressed schedule (working 80 hours across 9 business days with every other Friday off) or adjusted start/finish times.
+- All alternative work schedules require written approval from the Department Director and the People Partner, and may be modified if business needs demand.
+
+3. OFFICIAL CORPORATE PAID HOLIDAY SCHEDULE
+GlobalTech provides eleven (11) official paid company holidays each calendar year for all regular full-time and eligible part-time employees.
+
+3.1 Annual Observed Paid Holiday Schedule
+1. New Year's Day (January 1)
+2. Martin Luther King Jr. Day (Third Monday in January)
+3. Presidents' Day / Washington's Birthday (Third Monday in February)
+4. Memorial Day (Last Monday in May)
+5. Juneteenth National Independence Day (June 19)
+6. Independence Day (July 4)
+7. Labor Day (First Monday in September)
+8. Thanksgiving Day (Fourth Thursday in November)
+9. Day After Thanksgiving / Black Friday (Fourth Friday in November)
+10. Christmas Eve (December 24)
+11. Christmas Day (December 25)
+
+3.2 Regional & International Office Customization
+GlobalTech offices located outside the United States (e.g., London, UK; Singapore; Toronto, Canada) observe national statutory holidays in accordance with local labor statutes, maintaining an equivalent total entitlement of official paid holidays.
+
+4. WEEKEND HOLIDAY OBSERVANCE RULES
+When a designated corporate holiday falls on a weekend:
+- Friday Observance: If the official holiday falls on a Saturday, GlobalTech will observe the paid holiday on the immediately preceding Friday.
+- Monday Observance: If the official holiday falls on a Sunday, GlobalTech will observe the paid holiday on the immediately following Monday.
+All corporate offices are closed on observed holiday dates, and standard automated Slack and email out-of-office responders will be deployed.
+
+5. FLOATING HOLIDAYS (TWO DAYS PER YEAR)
+
+5.1 Annual Floating Holiday Grant
+In addition to our eleven (11) official fixed corporate holidays, GlobalTech provides every regular full-time employee with two (2) paid Floating Holidays (16 hours) on January 1 of each calendar year.
+- Floating holidays are designed to give team members flexibility to observe religious traditions, cultural celebrations, civic events, birthdays, or personal milestones that are not covered under official corporate holidays.
+- Mid-year new hires joining between January 1 and June 30 receive two (2) floating holidays; new hires joining between July 1 and September 30 receive one (1) floating holiday; new hires joining on or after October 1 are not eligible for floating holidays in their initial calendar year.
+
+5.2 Usage Guidelines and Rollover Prohibition
+- Scheduling: Floating holidays must be scheduled in advance with the employee's direct manager through the HR portal.
+- Use-It-or-Lose-It Rule: Floating holidays must be taken within the calendar year in which they are awarded (by December 31). Unused floating holidays do NOT roll over into the subsequent year and cannot be cashed out upon separation of employment.
+
+6. HOLIDAY PAY POLICIES AND SPECIAL CIRCUMSTANCES
+
+6.1 Holiday Falling During Scheduled PTO
+If an official paid corporate holiday falls on a scheduled business day during an employee's approved vacation PTO, the day is categorized as a paid Holiday and is NOT deducted from the employee's accrued PTO balance.
+
+6.2 Holiday Pay for Non-Exempt (Hourly) Personnel
+- Non-exempt employees who are scheduled off on a recognized corporate holiday receive eight (8) hours of straight-time holiday pay at their regular base hourly rate.
+- Non-exempt employees required to work on a recognized corporate holiday (such as mission-critical site reliability engineers or 24/7 security operations analysts) receive standard holiday pay PLUS one and one-half times (1.5x) their regular hourly rate for all actual hours worked on the holiday.
+
+6.3 Holiday Pay Eligibility During Leaves of Absence
+Employees on paid sick leave, paid parental leave, or bereavement leave receive regular holiday pay for holidays occurring during their leave. Employees on unpaid personal sabbaticals or unpaid statutory leaves of absence exceeding thirty (30) days are not eligible for holiday pay.

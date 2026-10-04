@@ -135,7 +135,7 @@ class EmployeeToolAgent:
             return updates
 
         # Workflow 2: Remote Work & Equipment Allowance Check
-        elif "remote" in q_lower or "equipment" in q_lower or "stipend" in q_lower:
+        elif ("remote" in q_lower or "equipment" in q_lower or "stipend" in q_lower) and not ("wellness" in q_lower or "benefit" in q_lower or "insurance" in q_lower):
             stipend_used = profile.get("equipment_stipend_used", 0.0)
             stipend_limit = profile.get("equipment_stipend_limit", 750.0)
             remaining_stipend = max(0.0, stipend_limit - stipend_used)
@@ -189,6 +189,20 @@ class EmployeeToolAgent:
             updates["tool_calls"].append(ben_res)
             b_info = ben_res.get("output", {})
             elections = b_info.get("benefits", {})
+
+            # Policy citation for benefits
+            policy_res = self.mcp.call_tool("search_policy_documents", {"query": "benefits wellness health insurance coverage", "top_k": 2})
+            updates["tool_calls"].append(policy_res)
+            if isinstance(policy_res.get("output"), list):
+                for c in policy_res["output"]:
+                    updates["citations"].append({
+                        "document_id": c.get("document_id", "POL-BEN-2024"),
+                        "document_title": c.get("document_title", "HR Policy"),
+                        "section_title": c.get("section_title", "Mental Health and Wellness"),
+                        "source_file": c.get("source_file", ""),
+                        "snippet": c.get("snippet", ""),
+                        "similarity_score": c.get("similarity_score", 0.0)
+                    })
 
             res_lines = [
                 f"### Benefits Status Dossier: {emp_name} ({emp_id})",

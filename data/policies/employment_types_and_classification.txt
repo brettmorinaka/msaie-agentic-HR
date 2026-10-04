@@ -1,0 +1,91 @@
+GLOBALTECH EMPLOYMENT TYPES, CLASSIFICATIONS AND JOB ARCHITECTURE POLICY
+Document ID: POL-EMP-2024
+Category: Talent Management & Job Architecture
+Effective Date: January 1, 2024
+Last Revised: February 20, 2024
+Audience: All GlobalTech Employees, People Managers, Talent Acquisition, and People Partners
+Policy Owner: People Operations & Global Compensation Committee
+
+1. PURPOSE AND REGULATORY FRAMEWORK
+GlobalTech is committed to transparent, equitable, and legally compliant workforce administration. This policy establishes our official employment categories, Fair Labor Standards Act (FLSA) exemption statuses, introductory probationary frameworks, dual-track job architecture, internal career mobility rules, and voluntary resignation notice standards.
+
+2. EMPLOYMENT CLASSIFICATIONS AND BENEFIT ELIGIBILITY
+
+2.1 Regular Full-Time Employees
+- Definition: Employees hired to work an ongoing, non-temporary schedule of at least thirty (30) scheduled hours per week (standard is 40 hours per week).
+- Benefit Eligibility: Full-time employees are eligible for the complete suite of GlobalTech total rewards, including comprehensive medical, dental, vision, 401(k) matching, paid parental leave, life insurance, wellness stipends, and standard PTO accrual schedules under POL-PTO-2024.
+
+2.2 Regular Part-Time Employees
+- Definition: Employees hired to work an ongoing schedule between twenty (20) and twenty-nine (29) scheduled hours per week.
+- Benefit Eligibility: Eligible for core medical, dental, and vision insurance with prorated employer premium subsidies. PTO accrues on a pro-rata basis proportional to scheduled hours relative to a 40-hour full-time workweek. Eligible for 401(k) matching. Ineligible for full-time equipment allowances unless approved by People Operations.
+
+2.3 Temporary Staff and Agency Contractors
+- Definition: Individuals engaged to perform specialized, project-based, or seasonal work for a predetermined, finite duration (typically not exceeding twelve [12] continuous months).
+- Benefit Ineligibility: Temporary staff, agency contractors (W2 through a third-party vendor), and independent 1099 contractors are not eligible to participate in GlobalTech employee benefits, paid time off accruals, holiday pay, or corporate retirement plans.
+
+2.4 Interns and Co-Op Students
+- Definition: Students or recent graduates participating in structured summer or semester internships (typically 10 to 12 weeks). Interns receive competitive hourly compensation, a dedicated technical mentor, and an assigned capstone project, but do not accrue vacation PTO.
+
+3. WAGE AND HOUR CLASSIFICATIONS (FLSA STATUS)
+
+3.1 Exempt Employees
+- Definition: Employees who meet the executive, administrative, professional, or computer professional salary and duties tests established under the Fair Labor Standards Act (FLSA) and applicable state wage and hour laws.
+- Compensation Structure: Exempt employees receive an established, fixed salary that compensates them for all hours worked in a given workweek. Exempt personnel are not eligible for statutory overtime compensation, regardless of the number of hours worked.
+
+3.2 Non-Exempt Employees and Overtime Regulations
+- Definition: Employees in non-exempt classifications (such as technical support specialists, executive assistants, and facilities coordinators) whose job responsibilities do not satisfy federal or state exemption criteria.
+- Time Tracking: Non-exempt personnel must accurately record all working hours daily (including exact clock-in, meal breaks, and clock-out times) using the electronic timekeeping portal. Working "off-the-clock" is strictly illegal and subject to severe disciplinary action.
+- Overtime Premium: Non-exempt employees receive overtime compensation at the rate of one and one-half times (1.5x) their regular hourly rate for all actual hours worked in excess of forty (40) hours in a single designated workweek (or eight [8] hours in a single workday in jurisdictions such as California). All overtime must be authorized in advance by the direct supervisor.
+
+4. INTRODUCTORY PROBATIONARY PERIOD (90 DAYS)
+
+4.1 Ninety-Day Evaluation Framework
+All newly hired regular full-time and part-time personnel participate in a ninety (90) calendar day introductory probationary period beginning on their official first day of active employment.
+- Purpose: The probationary period provides a structured timeframe for the employee to demonstrate core role competencies, master team engineering conventions, and integrate into our collaborative culture, while allowing management to evaluate performance trajectory.
+- Review Milestones: Formal written check-ins occur at thirty (30) days and sixty (60) days, culminating in a comprehensive ninety-day probationary evaluation.
+
+4.2 Conclusion of Probation and Transition of Status
+- Upon receiving a performance rating of "Meets Expectations" or higher on the 90-day evaluation, the employee formally graduates from introductory status.
+- Completion of the 90-day probationary period unlocks eligibility to apply for fully remote flexible work arrangements under POL-REMOTE-2024 and allows employees to request extended PTO leaves.
+- Extension of Probation: If an employee requires additional time to demonstrate role competencies due to medical absence or emergent training needs, the department manager and People Partner may extend probation for an additional thirty (30) calendar days in writing.
+
+5. DUAL-TRACK JOB ARCHITECTURE AND LEVELING FRAMEWORK
+GlobalTech maintains a transparent, dual-track engineering and business job architecture that values technical craftsmanship equally with people management:
+
+5.1 Individual Contributor (IC) Track
+- IC1: Associate Engineer / Specialist (Entry-level, developing core competencies under guidance).
+- IC2: Mid-Level Engineer / Specialist (Fully autonomous on standard feature delivery).
+- IC3: Senior Engineer / Senior Specialist (Leads complex projects, mentors junior peers).
+- IC4: Staff Engineer / Lead Specialist (Architectural domain ownership, cross-team impact).
+- IC5: Senior Staff Engineer / Principal Specialist (Broad organizational strategy and system architecture).
+- IC6: Principal Engineer / Director Specialist (Company-wide technological leadership).
+- IC7: Distinguished Engineer / Fellow (Industry-recognized luminary driving multi-year technical vision).
+
+5.2 Management (M) Track
+- M1: Engineering Manager / Team Lead (Direct people management, 1-on-1s, sprint execution).
+- M2: Senior Manager (Manages multiple agile pods or specialized functional groups).
+- M3: Director (Strategic departmental leadership, resource planning, organizational scaling).
+- M4: Senior Director (Cross-departmental executive leadership, budget allocation).
+- M5: Vice President / Executive Leadership (Enterprise executive strategy).
+
+6. INTERNAL MOBILITY, TRANSFERS, AND PROMOTIONS
+
+6.1 Eligibility for Internal Mobility
+GlobalTech is passionate about career development and prioritizes promoting from within. Employees in good standing are encouraged to apply for open internal roles across different teams, engineering domains, or international offices:
+- Minimum Tenure Requirement: Employees must complete at least **twelve (12) continuous months of service** in their current role prior to initiating a lateral transfer or internal application.
+- Performance Standard: Must maintain a current performance rating of "Meets Expectations" (Level 3) or higher and must not be subject to an active formal Performance Improvement Plan (PIP).
+- Manager Notification: While employees may explore open internal job postings confidentially, they must inform their current manager prior to accepting a formal second-round interview with a hiring team.
+
+6.2 Transition Timelines
+Once an internal transfer offer is accepted, the current manager and new hiring manager will establish a reasonable transition timeline, not to exceed thirty (30) calendar days, ensuring knowledge transfer and project handover.
+
+7. VOLUNTARY RESIGNATION AND NOTICE GUIDELINES
+
+7.1 Advance Notice Guidelines
+Employees who choose to voluntarily resign from GlobalTech to pursue other opportunities are requested to provide professional written advance notice to their manager and People Partner:
+- Individual Contributors (IC1 through IC4): Minimum of **two (2) full weeks (10 business days)** advance notice.
+- Senior Leadership & Management (IC5+, M1 through M5): Minimum of **four (4) full weeks (20 business days)** advance notice to facilitate leadership transition and executive succession.
+
+7.2 Exit Interview and Final Pay
+- An exit interview will be conducted by People Operations to gather candid feedback on company culture, leadership, and workplace experience.
+- Final paychecks, including all accrued wages, reimbursable business expenses, and accrued unused PTO (where mandated by state law), will be disbursed in strict accordance with statutory state payroll timelines.

@@ -9,7 +9,7 @@ This document provides deployment URLs, health endpoints, container execution de
 | Service / Interface | Deployed Public URL | Local Development URL | Description |
 | :--- | :--- | :--- | :--- |
 | **Interactive Web Application (Streamlit)** | [https://msaie-agentic-hr.onrender.com](https://msaie-agentic-hr.onrender.com) | [http://localhost:8501](http://localhost:8501) | Full interactive chat UI with persona switcher, 1-click demo tasks, citation cards, and operational traces. |
-| **Service Health Check Endpoint** | [https://msaie-agentic-hr.onrender.com/health](https://msaie-agentic-hr.onrender.com/health) | [http://localhost:8000/health](http://localhost:8000/health) | JSON endpoint returning system status, vector store chunk count (37 chunks), and MCP connectivity. |
+| **Service Health Check Endpoint** | [https://msaie-agentic-hr.onrender.com/health](https://msaie-agentic-hr.onrender.com/health) | [http://localhost:8000/health](http://localhost:8000/health) | JSON endpoint returning system status, vector store chunk count (152 chunks), and MCP connectivity. |
 | **Chat & Multi-Agent API Endpoint** | [https://msaie-agentic-hr.onrender.com/chat](https://msaie-agentic-hr.onrender.com/chat) | [http://localhost:8000/chat](http://localhost:8000/chat) | `POST` endpoint accepting user inquiries and returning answers, citations, and MCP tool traces. |
 | **Interactive API Documentation** | [https://msaie-agentic-hr.onrender.com/docs](https://msaie-agentic-hr.onrender.com/docs) | [http://localhost:8000/docs](http://localhost:8000/docs) | Swagger UI for interactive testing of REST API endpoints. |
 | **MCP Tool Server** | [https://msaie-agentic-hr.onrender.com/mcp](https://msaie-agentic-hr.onrender.com/mcp) | [http://localhost:8001/mcp](http://localhost:8001/mcp) | JSON-RPC 2.0 / Streamable HTTP endpoint for the 8 registered MCP tools. |
@@ -31,7 +31,7 @@ curl -X GET https://msaie-agentic-hr.onrender.com/health
   "status": "healthy",
   "app": "GlobalTech HR Multi-Agent Automation System",
   "version": "1.0.0",
-  "vector_store_chunks": 37,
+  "vector_store_chunks": 152,
   "mcp_server_connected": true,
   "registered_tools_count": 8,
   "timestamp": "2026-10-02T20:30:00Z"
