@@ -268,7 +268,7 @@ def main():
             if response.get("action_safety") == "CONFIRMATION_REQUIRED":
                 st.session_state.pending_confirmation = {
                     "message": "Please confirm ticket creation.",
-                    "employee_id": active_emp_id or "EMP-101",
+                    "employee_id": active_emp_id,
                     "ticket_type": "PTO Request"
                 }
 

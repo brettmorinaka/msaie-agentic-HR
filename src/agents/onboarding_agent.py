@@ -25,13 +25,64 @@ class OnboardingAgent:
             "citations": list(state.get("citations", []))
         }
 
-        # 1. Identify employee ID
+        # 1. Identify employee ID strictly from state or query
         emp_id = state.get("employee_id")
         if not emp_id:
             emp_match = re.search(r"EMP-[A-Z0-9-]+", query, re.IGNORECASE)
-            emp_id = emp_match.group(0).upper() if emp_match else "EMP-NEW-01"
+            emp_id = emp_match.group(0).upper() if emp_match else None
 
-        # 2. Lookup employee profile via MCP
+        # Check if user query requires a personal employee profile
+        q_lower = query.lower()
+        words = set(re.findall(r"\b\w+\b", q_lower))
+        requires_personal_profile = any(w in words for w in ["checklist", "progress", "status", "draft", "email", "my", "me", "dossier"])
+
+        if not emp_id and requires_personal_profile:
+            updates["final_response"] = (
+                "To view a personalized onboarding checklist, track progress, or draft a welcome email, "
+                "please provide your Employee ID."
+            )
+            updates["operational_trace"].append({
+                "agent": "OnboardingAgent",
+                "status": "EMPLOYEE_ID_REQUIRED",
+                "message": "Halted personal profile lookup: Request lacked an employee ID and cannot return information for another employee."
+            })
+            return updates
+
+        if not emp_id:
+            # General onboarding policy question without a personal employee record
+            policy_res = self.mcp.call_tool("search_policy_documents", {
+                "query": "new hire onboarding equipment allowance benefits 30 calendar days enrollment",
+                "top_k": 2
+            })
+            updates["tool_calls"].append(policy_res)
+            updates["operational_trace"].append({
+                "agent": "OnboardingAgent",
+                "action": "search_policy_documents",
+                "arguments": {"query": "new hire onboarding equipment allowance benefits", "top_k": 2},
+                "status": policy_res["status"]
+            })
+            if isinstance(policy_res.get("output"), list):
+                for c in policy_res["output"]:
+                    updates["citations"].append({
+                        "document_id": c.get("document_id", "POL-ONB-2024"),
+                        "document_title": c.get("document_title", "HR Policy"),
+                        "section_title": c.get("section_title", "Enrollment"),
+                        "source_file": c.get("source_file", ""),
+                        "snippet": c.get("snippet", ""),
+                        "similarity_score": c.get("similarity_score", 0.0)
+                    })
+
+            updates["final_response"] = (
+                "### New Hire Onboarding Policies & Deadlines\n\n"
+                "**Key Onboarding Guidelines:**\n"
+                "1. **Benefits Enrollment Window:** New team members have **30 calendar days from start date** to finalize medical, dental, and vision elections with Day 1 coverage ([POL-BEN-2024: 1. Enrollment Windows]).\n"
+                "2. **Home Office Equipment Allowance:** Newly approved remote employees are eligible for a one-time allowance of up to **$750 USD** for home office gear within 60 days of approval ([POL-REMOTE-2024: 3. Home Office Equipment Allowance]).\n"
+                "3. **Introductory Period:** The introductory probationary period lasts 90 days from hire date ([POL-REMOTE-2024: 2. Eligibility Requirements]).\n"
+                "4. **Code of Conduct:** Review and acknowledge the GlobalTech Code of Business Conduct within your first week ([POL-ETHICS-2024: 2. Equal Opportunity and Anti-Harassment])."
+            )
+            return updates
+
+        # 2. Lookup employee profile via MCP for the specific employee
         profile_res = self.mcp.call_tool("lookup_employee_profile", {"employee_id": emp_id})
         updates["tool_calls"].append(profile_res)
         updates["operational_trace"].append({

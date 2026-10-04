@@ -87,7 +87,7 @@ msaie-agentic-HR/
 │   ├── eval_dataset.json           # 25 benchmark evaluation test cases
 │   ├── run_eval.py                 # Evaluation benchmark runner & ablation study
 │   └── results.md                  # Comprehensive evaluation results report
-├── tests/                          # 29 automated unit and integration tests
+├── tests/                          # 32 automated unit and integration tests
 ├── .github/workflows/ci.yml        # GitHub Actions CI/CD pipeline
 ├── Dockerfile                      # Container build definition
 ├── render.yaml                     # Render.com deployment manifest
@@ -214,7 +214,7 @@ curl -X POST http://localhost:8000/chat \
 
 ## 🧪 Testing & CI/CD Pipeline
 
-Run the complete automated test suite (29 unit and integration tests):
+Run the complete automated test suite (32 unit and integration tests):
 ```bash
 pytest -v
 ```
@@ -223,7 +223,7 @@ pytest -v
 The automated pipeline defined in `.github/workflows/ci.yml` runs on every push and pull request:
 1. Installs pinned dependencies from `requirements.txt`.
 2. Ingests and verifies the policy corpus.
-3. Runs all 29 automated unit and smoke tests.
+3. Runs all 32 automated unit and smoke tests.
 4. Executes the 25-case evaluation benchmark runner.
 5. Verifies app startup and dynamic MCP tool discovery.
 

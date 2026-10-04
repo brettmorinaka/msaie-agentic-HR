@@ -89,9 +89,9 @@ class HROrchestrator:
         workflow = classification.get("workflow", "policy_rag")
         reasoning = classification.get("reasoning", "LLM-classified intent")
 
-        # Extract or resolve employee ID
+        # Extract or resolve employee ID strictly from query text or active session context
         emp_match = re.search(r"EMP-[A-Z0-9-]+", query, re.IGNORECASE)
-        emp_id = existing_emp_id or classification.get("employee_id") or (emp_match.group(0).upper() if emp_match else None)
+        emp_id = existing_emp_id or (emp_match.group(0).upper() if emp_match else None)
 
         trace.append({
             "step": "intent_routing",
@@ -133,8 +133,8 @@ class HROrchestrator:
                 "operational_trace": trace
             }
 
-        # Check ambiguity
-        is_ambiguous, clarification = HRGuardrails.check_ambiguity(query, workflow=workflow)
+        # Check ambiguity and employee identification
+        is_ambiguous, clarification = HRGuardrails.check_ambiguity(query, workflow=workflow, employee_id=state.get("employee_id"))
         if is_ambiguous or workflow == "clarification":
             trace.append({
                 "step": "guardrail_ambiguity_check",

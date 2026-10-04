@@ -39,3 +39,28 @@ def test_operational_trace_structure(orchestrator):
     assert len(trace) >= 2
     assert any(step.get("step") == "intent_routing" and step.get("classifier") == "llm" for step in trace)
     assert any(step.get("step") == "guardrail_check" for step in trace)
+
+def test_pto_balance_without_employee_id_does_not_leak_data(orchestrator):
+    res = orchestrator.run("Check my PTO balance", employee_id=None)
+    assert "Alice Chen" not in res["answer"]
+    assert "14.5" not in res["answer"]
+    assert "Employee ID" in res["answer"]
+    tool_names = [t.get("tool_name") for t in res["mcp_tool_trace"]]
+    assert "check_pto_balance" not in tool_names
+
+def test_onboarding_without_employee_id_does_not_leak_data(orchestrator):
+    res = orchestrator.run("Show my onboarding checklist", employee_id=None)
+    assert "Jordan Hayes" not in res["answer"]
+    assert "EMP-NEW-01" not in res["answer"]
+    assert "Employee ID" in res["answer"]
+    tool_names = [t.get("tool_name") for t in res["mcp_tool_trace"]]
+    assert "lookup_employee_profile" not in tool_names
+
+def test_general_onboarding_policy_query_without_employee_id(orchestrator):
+    res = orchestrator.run("What are the new hire benefits election deadlines and equipment allowance?", employee_id=None)
+    assert "30 calendar days" in res["answer"]
+    assert "$750" in res["answer"]
+    assert "Jordan Hayes" not in res["answer"]
+    assert "Alice Chen" not in res["answer"]
+    tool_names = [t.get("tool_name") for t in res["mcp_tool_trace"]]
+    assert "lookup_employee_profile" not in tool_names

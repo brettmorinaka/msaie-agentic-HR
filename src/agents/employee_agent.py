@@ -29,11 +29,23 @@ class EmployeeToolAgent:
             "action_safety_status": "SAFE"
         }
 
-        # 1. Identify employee ID
+        # 1. Identify employee ID strictly from state or query
         emp_id = state.get("employee_id")
         if not emp_id:
             emp_match = re.search(r"EMP-[A-Z0-9-]+", query, re.IGNORECASE)
-            emp_id = emp_match.group(0).upper() if emp_match else "EMP-101"
+            emp_id = emp_match.group(0).upper() if emp_match else None
+
+        if not emp_id:
+            updates["final_response"] = (
+                "To access employee records, check your personal balances, or submit requests, "
+                "please provide your Employee ID (e.g., EMP-101, EMP-102)."
+            )
+            updates["operational_trace"].append({
+                "agent": "EmployeeToolAgent",
+                "status": "EMPLOYEE_ID_REQUIRED",
+                "message": "Halted execution: Request lacked an employee ID and cannot return information for another employee."
+            })
+            return updates
 
         # Lookup employee profile
         profile_res = self.mcp.call_tool("lookup_employee_profile", {"employee_id": emp_id})

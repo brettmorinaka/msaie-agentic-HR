@@ -62,17 +62,29 @@ class HRGuardrails:
         return True, None
 
     @staticmethod
-    def check_ambiguity(query: str, workflow: Optional[str] = None) -> Tuple[bool, Optional[str]]:
+    def check_ambiguity(query: str, workflow: Optional[str] = None, employee_id: Optional[str] = None) -> Tuple[bool, Optional[str]]:
         """
-        Checks whether a requested workflow is missing necessary information.
+        Checks whether a requested workflow is missing necessary information or employee identity.
         """
         if workflow == "clarification":
             return True, (
-                "To assist with your time off request, please provide your Employee ID (e.g., EMP-101) "
-                "and the target dates or number of days you plan to take."
+                "To assist with your request, please provide your Employee ID (e.g., EMP-101) "
+                "and the target dates or details for your inquiry."
             )
 
         q_lower = query.lower()
+        has_emp_id = bool(employee_id) or bool(re.search(r"EMP-\w+", query, re.IGNORECASE))
+
+        # Check if user is asking for personal employee balances or actions without an employee ID
+        is_personal_employee_action = (
+            any(w in q_lower for w in ["my pto", "my balance", "my equipment stipend", "my benefits", "my checklist", "my status"]) or
+            (workflow == "employee_workflow" and not any(w in q_lower for w in ["how do", "rollover", "interact", "what is the annual", "accrual tier", "compliance", "complies"]))
+        )
+        if is_personal_employee_action and not has_emp_id:
+            return True, (
+                "To access employee records, check your personal balances, or submit requests, "
+                "please provide your Employee ID (e.g., EMP-101, EMP-102)."
+            )
 
         # Check if user is asking to book or request time off without dates or employee ID
         is_requesting_time_off = (
@@ -84,7 +96,6 @@ class HRGuardrails:
         is_info_question = bool(re.search(r"^(?:how|what|can|when|who|where)\b", q_lower.strip()))
 
         if is_requesting_time_off and not is_info_question:
-            has_emp_id = bool(re.search(r"EMP-\w+", query, re.IGNORECASE))
             has_days_or_dates = bool(re.search(r"\d+\s*(?:day|days|week|weeks|hours)", q_lower)) or bool(re.search(r"\d{4}-\d{2}-\d{2}", query))
             if not has_emp_id and not has_days_or_dates:
                 return True, (
