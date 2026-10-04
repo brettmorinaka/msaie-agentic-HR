@@ -78,3 +78,32 @@ def test_create_mock_hr_ticket_safety(mcp_client):
     assert conf["status"] == "success"
     assert conf["output"]["action_safety"] == "MOCK_EXECUTED"
     assert "TCK-" in conf["output"]["ticket_id"]
+
+def test_fastmcp_tool_decorations():
+    from src.mcp.tools import mcp
+    tools = mcp._tool_manager.list_tools()
+    tool_names = [t.name for t in tools]
+    assert len(tools) == 8
+    assert "search_policy_documents" in tool_names
+    assert "get_policy_section" in tool_names
+    assert "lookup_employee_profile" in tool_names
+    assert "check_pto_balance" in tool_names
+    assert "lookup_benefits_status" in tool_names
+    assert "create_mock_hr_ticket" in tool_names
+    assert "check_policy_compliance" in tool_names
+    assert "draft_hr_email" in tool_names
+
+def test_multiserver_mcp_client_integration(mcp_client):
+    assert hasattr(mcp_client, "multi_server_client")
+    assert "hr_mcp_server" in mcp_client.connections
+    lc_tools = mcp_client.get_langchain_tools()
+    assert len(lc_tools) >= 8
+    tool_map = {t.name: t for t in lc_tools}
+    assert "check_pto_balance" in tool_map
+    res = tool_map["check_pto_balance"].invoke({"employee_id": "EMP-101"})
+    if isinstance(res, tuple):
+        data = res[1]["structured_content"]["result"]
+    else:
+        data = res
+    assert data["pto_balance_days"] > 0
+

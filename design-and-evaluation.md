@@ -140,12 +140,15 @@ To solve this, `HeadingAwareChunker` (`src/rag/chunker.py`) uses regex-based sec
 ## 3. Model Context Protocol (MCP) Server Design
 
 ### 3.1 Architecture & Transport Choices
-The MCP subsystem adheres to the Model Context Protocol standard:
-- **Transport:** Streamable HTTP / JSON-RPC 2.0 running on `http://localhost:8001/mcp`.
-- **JSON-RPC Endpoints:**
-  - `tools/list`: Returns full JSON schema definitions for all registered tools.
-  - `tools/call`: Executes a tool by name with client-supplied arguments and returns structured output.
-- **Client Fallback:** `MCPClient` (`src/mcp/client.py`) checks HTTP connectivity first; if the standalone HTTP server is offline, it executes through the in-process Python registry fallback with identical schema validation and telemetry tracking.
+The MCP subsystem adheres to the standard Model Context Protocol using **FastMCP** (`mcp.server.fastmcp`) and **langchain-mcp-adapters** (`langchain_mcp_adapters`):
+- **Server Framework (`FastMCP`):** `src/mcp/tools.py` defines the MCP server using `FastMCP("HR-Automation-MCP-Server")`.
+- **Tooling Decorators (`@mcp.tool()`):** All 8 tools are explicitly registered using `@mcp.tool()`, generating standard JSON Schemas from Python type annotations and docstrings while remaining directly invokable.
+- **Client Framework (`MultiServerMCPClient`):** `MCPClient` (`src/mcp/client.py`) incorporates `langchain_mcp_adapters.client.MultiServerMCPClient`, supporting multi-server connection management across SSE, Stdio, and in-process execution.
+- **Transports Supported:**
+  - **SSE Transport:** FastMCP Server mounts `mcp.sse_app()` at `/sse` on `http://localhost:8001/sse` for streaming client sessions.
+  - **Stdio Transport:** Run via `python -m src.mcp.server --stdio` for headless subprocess communication with `MultiServerMCPClient`.
+  - **JSON-RPC REST Fallback:** `/mcp` and `/mcp/call` provide backward-compatible JSON-RPC 2.0 dispatch.
+- **LangChain Tool Integration:** `MCPClient.get_langchain_tools()` dynamically retrieves converted LangChain `BaseTool` / `StructuredTool` instances, supporting both synchronous `invoke()` and asynchronous `ainvoke()`.
 
 ### 3.2 Operational Telemetry Trace
 Every tool invocation logs:
@@ -153,7 +156,7 @@ Every tool invocation logs:
 - Input arguments
 - Output payload
 - Execution latency in milliseconds
-- Execution status (`SUCCESS` / `ERROR`)
+- Execution status (`SUCCESS`, `CONFIRMATION_REQUIRED`, or `ERROR`)
 
 This trace is exposed via the API `/chat` response and rendered in the Streamlit UI accordion.
 

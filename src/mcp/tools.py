@@ -1,10 +1,16 @@
+import sys
 import json
 import datetime
 from pathlib import Path
 from typing import Dict, Any, List, Optional
+from mcp.server.fastmcp import FastMCP
 
 from src.config import EMPLOYEES_FILE, TICKETS_FILE, CHROMA_PERSIST_DIR
 from src.rag.vector_store import PolicyVectorStore
+
+# Initialize FastMCP Server
+mcp = FastMCP("HR-Automation-MCP-Server")
+mcp.settings.transport_security.enable_dns_rebinding_protection = False
 
 _vector_store: Optional[PolicyVectorStore] = None
 
@@ -15,6 +21,7 @@ def get_vector_store() -> PolicyVectorStore:
     return _vector_store
 
 
+@mcp.tool()
 def search_policy_documents(query: str, top_k: int = 3, filter_category: Optional[str] = None) -> List[Dict[str, Any]]:
     """
     Search the HR policy database using semantic retrieval.
@@ -24,6 +31,7 @@ def search_policy_documents(query: str, top_k: int = 3, filter_category: Optiona
     return vs.search(query=query, top_k=top_k, filter_category=filter_category)
 
 
+@mcp.tool()
 def get_policy_section(document_id: str, section_title: str) -> Dict[str, Any]:
     """
     Retrieve full text and metadata for a specific section within an HR policy document.
@@ -39,6 +47,7 @@ def get_policy_section(document_id: str, section_title: str) -> Dict[str, Any]:
     }
 
 
+@mcp.tool()
 def lookup_employee_profile(employee_id: str) -> Dict[str, Any]:
     """
     Lookup structured employee details including role, department, tenure, manager,
@@ -56,9 +65,10 @@ def lookup_employee_profile(employee_id: str) -> Dict[str, Any]:
     return {"error": f"Employee with ID '{clean_id}' was not found in directory", "employee_id": clean_id}
 
 
+@mcp.tool()
 def check_pto_balance(employee_id: str) -> Dict[str, Any]:
     """
-    Retrieve PTO and paid sick leave balances, tenure tier, and rollover rules for an employee.
+    Retrieve PTO and paid sick leave balances, accrual tiers, and rollover rules for an employee.
     """
     profile = lookup_employee_profile(employee_id)
     if "error" in profile:
@@ -83,6 +93,7 @@ def check_pto_balance(employee_id: str) -> Dict[str, Any]:
     }
 
 
+@mcp.tool()
 def lookup_benefits_status(employee_id: str) -> Dict[str, Any]:
     """
     Retrieve healthcare, retirement 401(k), FSA/HSA, and wellness stipend election details.
@@ -102,6 +113,7 @@ def lookup_benefits_status(employee_id: str) -> Dict[str, Any]:
     }
 
 
+@mcp.tool()
 def create_mock_hr_ticket(employee_id: str, ticket_type: str, details: str, confirmed: bool = False) -> Dict[str, Any]:
     """
     Create a mock HR ticket or workflow request.
@@ -158,6 +170,7 @@ def create_mock_hr_ticket(employee_id: str, ticket_type: str, details: str, conf
     }
 
 
+@mcp.tool()
 def check_policy_compliance(action_type: str, details: Dict[str, Any]) -> Dict[str, Any]:
     """
     Evaluate compliance of proposed employee actions against policy guidelines:
@@ -240,6 +253,7 @@ def check_policy_compliance(action_type: str, details: Dict[str, Any]) -> Dict[s
     }
 
 
+@mcp.tool()
 def draft_hr_email(recipient: str, subject: str, body_bullet_points: List[str]) -> Dict[str, Any]:
     """
     Draft a professional HR communication email to an employee or manager.
@@ -261,113 +275,15 @@ def draft_hr_email(recipient: str, subject: str, body_bullet_points: List[str]) 
     }
 
 
-# Tool Definitions for MCP Registry
+# Tool Definitions for MCP Registry generated from FastMCP
 MCP_TOOL_DEFINITIONS = [
     {
-        "name": "search_policy_documents",
-        "description": "Search HR policy corpus using semantic retrieval. Returns matching policy sections with citations and snippets.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "query": {"type": "string", "description": "Search query or question about HR policies"},
-                "top_k": {"type": "integer", "description": "Number of relevant chunks to retrieve", "default": 3},
-                "filter_category": {"type": "string", "description": "Optional category filter"}
-            },
-            "required": ["query"]
-        },
-        "handler": search_policy_documents
-    },
-    {
-        "name": "get_policy_section",
-        "description": "Retrieve full text and metadata for a specific section within an HR policy document.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "document_id": {"type": "string", "description": "Document ID (e.g. POL-REMOTE-2024)"},
-                "section_title": {"type": "string", "description": "Title or keyword of the section"}
-            },
-            "required": ["document_id", "section_title"]
-        },
-        "handler": get_policy_section
-    },
-    {
-        "name": "lookup_employee_profile",
-        "description": "Lookup structured employee details including role, department, tenure, manager, and onboarding status.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "employee_id": {"type": "string", "description": "Employee ID (e.g. EMP-101, EMP-102)"}
-            },
-            "required": ["employee_id"]
-        },
-        "handler": lookup_employee_profile
-    },
-    {
-        "name": "check_pto_balance",
-        "description": "Retrieve PTO and sick leave balances, accrual tiers, and rollover deadlines for an employee.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "employee_id": {"type": "string", "description": "Employee ID (e.g. EMP-101)"}
-            },
-            "required": ["employee_id"]
-        },
-        "handler": check_pto_balance
-    },
-    {
-        "name": "lookup_benefits_status",
-        "description": "Retrieve employee healthcare, retirement 401(k), HSA/FSA, and wellness stipend election details.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "employee_id": {"type": "string", "description": "Employee ID (e.g. EMP-101)"}
-            },
-            "required": ["employee_id"]
-        },
-        "handler": lookup_benefits_status
-    },
-    {
-        "name": "create_mock_hr_ticket",
-        "description": "Create a mock HR ticket. Action safety: requires explicit user confirmation (confirmed=True).",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "employee_id": {"type": "string", "description": "Employee ID"},
-                "ticket_type": {"type": "string", "description": "Type of ticket (e.g. PTO Request, Equipment Stipend)"},
-                "details": {"type": "string", "description": "Description of the request"},
-                "confirmed": {"type": "boolean", "description": "Explicit confirmation flag", "default": False}
-            },
-            "required": ["employee_id", "ticket_type", "details"]
-        },
-        "handler": create_mock_hr_ticket
-    },
-    {
-        "name": "check_policy_compliance",
-        "description": "Evaluate compliance of an employee action against policy rules (remote_work, expense_claim, pto_request).",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "action_type": {"type": "string", "enum": ["remote_work", "expense_claim", "pto_request"]},
-                "details": {"type": "object", "description": "Action specific attributes to validate"}
-            },
-            "required": ["action_type", "details"]
-        },
-        "handler": check_policy_compliance
-    },
-    {
-        "name": "draft_hr_email",
-        "description": "Draft a formal HR communication email to an employee or manager.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "recipient": {"type": "string", "description": "Recipient name or email"},
-                "subject": {"type": "string", "description": "Email subject line"},
-                "body_bullet_points": {"type": "array", "items": {"type": "string"}, "description": "Key bullet points to include"}
-            },
-            "required": ["recipient", "subject", "body_bullet_points"]
-        },
-        "handler": draft_hr_email
+        "name": t.name,
+        "description": t.description,
+        "inputSchema": t.parameters,
+        "handler": t.fn
     }
+    for t in mcp._tool_manager.list_tools()
 ]
 
-TOOL_MAP = {t["name"]: t["handler"] for t in MCP_TOOL_DEFINITIONS}
+TOOL_MAP = {t.name: t.fn for t in mcp._tool_manager.list_tools()}

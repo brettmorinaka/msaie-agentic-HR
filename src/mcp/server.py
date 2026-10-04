@@ -10,13 +10,16 @@ ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
 from src.config import MCP_SERVER_HOST, MCP_SERVER_PORT
-from src.mcp.tools import MCP_TOOL_DEFINITIONS, TOOL_MAP
+from src.mcp.tools import mcp, MCP_TOOL_DEFINITIONS, TOOL_MAP
 
 app = FastAPI(
-    title="HR Automation MCP Server",
-    description="Model Context Protocol (MCP) Server exposing tools for policy search, employee records, and workflow execution.",
+    title="HR Automation FastMCP Server",
+    description="Model Context Protocol (MCP) Server using FastMCP and langchain-mcp-adapters.",
     version="1.0.0"
 )
+
+# Mount FastMCP SSE transport app
+app.mount("/sse", mcp.sse_app())
 
 @app.get("/health")
 @app.get("/mcp/health")
@@ -24,7 +27,7 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "mcp-hr-tools",
-        "protocol": "Model Context Protocol (MCP)",
+        "protocol": "Model Context Protocol (MCP) via FastMCP",
         "tools_count": len(MCP_TOOL_DEFINITIONS)
     }
 
@@ -101,51 +104,49 @@ async def handle_mcp_request(request: Request):
                 return JSONResponse({
                     "jsonrpc": "2.0",
                     "id": msg_id,
-                    "result": {
-                        "content": [{"type": "text", "text": f"Tool execution failed: {str(e)}"}],
-                        "isError": True
-                    }
-                })
+                    "error": {"code": -32000, "message": str(e)}
+                }, status_code=500)
 
-        elif method == "ping":
-            return JSONResponse({"jsonrpc": "2.0", "id": msg_id, "result": {}})
-
-        else:
+        elif method == "initialize":
             return JSONResponse({
                 "jsonrpc": "2.0",
                 "id": msg_id,
-                "error": {"code": -32601, "message": f"Method '{method}' not implemented"}
-            }, status_code=400)
+                "result": {
+                    "protocolVersion": "2024-11-05",
+                    "capabilities": {"tools": {}},
+                    "serverInfo": {
+                        "name": "HR-Automation-MCP-Server",
+                        "version": "1.0.0"
+                    }
+                }
+            })
 
-    # Simplified REST invocation: {"tool": "...", "arguments": {...}} or {"name": "...", "arguments": {...}}
-    tool_name = body.get("name") or body.get("tool")
-    arguments = body.get("arguments", {})
+    # Direct REST dispatch
+    elif isinstance(body, dict) and "name" in body:
+        tool_name = body.get("name")
+        arguments = body.get("arguments", {})
 
-    if not tool_name:
-        return JSONResponse({"error": "Missing 'name' or 'tool' in request"}, status_code=400)
+        if tool_name not in TOOL_MAP:
+            return JSONResponse({"error": f"Tool '{tool_name}' not found"}, status_code=404)
 
-    if tool_name not in TOOL_MAP:
-        return JSONResponse({"error": f"Tool '{tool_name}' not found"}, status_code=404)
+        try:
+            result = TOOL_MAP[tool_name](**arguments)
+            return JSONResponse({"status": "success", "tool": tool_name, "result": result})
+        except Exception as e:
+            return JSONResponse({"status": "error", "tool": tool_name, "error": str(e)}, status_code=500)
 
-    try:
-        result = TOOL_MAP[tool_name](**arguments)
-        return JSONResponse({
-            "tool": tool_name,
-            "status": "success",
-            "result": result
-        })
-    except Exception as e:
-        return JSONResponse({
-            "tool": tool_name,
-            "status": "error",
-            "error": str(e)
-        }, status_code=500)
+    return JSONResponse({"error": "Invalid MCP request format"}, status_code=400)
 
 
 def start_server(host: str = MCP_SERVER_HOST, port: int = MCP_SERVER_PORT):
-    print(f"[*] Starting MCP Server on http://{host}:{port}")
+    """Start the FastMCP HTTP and SSE server using uvicorn."""
+    print(f"[*] Starting FastMCP Server on http://{host}:{port}")
     uvicorn.run(app, host=host, port=port, log_level="info")
 
 
 if __name__ == "__main__":
-    start_server()
+    if "--stdio" in sys.argv:
+        # FastMCP native stdio runner for subprocess MCP clients
+        mcp.run(transport="stdio")
+    else:
+        start_server()

@@ -29,7 +29,8 @@ An autonomous, multi-agent Human Resources automation system built with **LangGr
    - **Employee Tool Agent:** Checks live PTO balances, validates notice compliance, and files mock tickets.
 
 2. **Model Context Protocol (MCP) Integration:**
-   - 8 fully registered MCP tools exposed via standard MCP JSON-RPC 2.0 and Streamable HTTP.
+   - 8 fully registered MCP tools built using **FastMCP** (`mcp.server.fastmcp`) with `@mcp.tool()` decorators.
+   - Client connectivity and LangChain tool conversion powered by **langchain-mcp-adapters** and **MultiServerMCPClient**, supporting SSE, Stdio, and in-process execution.
    - The agent invokes all tools exclusively through the MCP client layer with full operational telemetry (arguments, outputs, latency).
 
 3. **Action Safety Guardrails:**
@@ -86,7 +87,7 @@ msaie-agentic-HR/
 │   ├── eval_dataset.json           # 25 benchmark evaluation test cases
 │   ├── run_eval.py                 # Evaluation benchmark runner & ablation study
 │   └── results.md                  # Comprehensive evaluation results report
-├── tests/                          # 25 automated unit and integration tests
+├── tests/                          # 27 automated unit and integration tests
 ├── .github/workflows/ci.yml        # GitHub Actions CI/CD pipeline
 ├── Dockerfile                      # Container build definition
 ├── render.yaml                     # Render.com deployment manifest
@@ -213,7 +214,7 @@ curl -X POST http://localhost:8000/chat \
 
 ## 🧪 Testing & CI/CD Pipeline
 
-Run the complete automated test suite (25 unit and integration tests):
+Run the complete automated test suite (27 unit and integration tests):
 ```bash
 pytest -v
 ```

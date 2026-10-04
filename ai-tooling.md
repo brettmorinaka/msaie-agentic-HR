@@ -22,9 +22,10 @@ This document details the AI-assisted engineering tools utilized during the desi
 - **Heading-Aware Strategy:** AI generated regex patterns matching both Markdown headers (`#` to `####`) and uppercase numbered section delimiters (`1. PURPOSE`), ensuring policy boundaries were preserved with prepended document and section context tokens.
 - **Outcome:** Successfully indexed 152 self-contained semantic chunks across 11 comprehensive corporate policy documents (16,538 words, ~55 standard pages) without manual segmentation.
 
-### 2.2 Model Context Protocol (MCP) Server & Tool Registry
-- **Application:** AI generated the 8 standardized tool definitions in `src/mcp/tools.py` conforming to JSON-RPC 2.0 specifications.
-- **Dual Transport Integration:** Implemented both a standalone FastAPI MCP HTTP server (`src/mcp/server.py`) on port 8001 and an in-process fallback client (`src/mcp/client.py`) with complete operational telemetry (tool arguments, return values, and execution latency).
+### 2.2 Model Context Protocol (MCP) with FastMCP & langchain-mcp-adapters
+- **Application:** Refactored tool definitions using **FastMCP** (`mcp.server.fastmcp`) with `@mcp.tool()` decorators in `src/mcp/tools.py`.
+- **Client Integration:** Implemented **langchain-mcp-adapters** and **MultiServerMCPClient** (`src/mcp/client.py`), allowing seamless tool discovery and LangChain `BaseTool` conversion across SSE, Stdio, and in-process execution.
+- **Dual Transport Integration:** Implemented FastMCP SSE mounting (`/sse`, `/messages`) and standalone stdio subprocess execution (`python -m src.mcp.server --stdio`) with full operational telemetry (tool arguments, return values, and latency).
 
 ### 2.3 LangGraph Multi-Agent Orchestration
 - **Application:** AI structured the `StateGraph` state machine (`src/agents/orchestrator.py`) using a centralized `HRAgentState` TypedDict.
@@ -49,9 +50,9 @@ This document details the AI-assisted engineering tools utilized during the desi
 - Writing LangGraph graph definitions and TypedDict models by hand is verbose and error-prone. The AI assistant quickly generated complete, type-safe graph declarations with conditional branches, input validation, and clear node responsibilities.
 - The separation of sub-agents (`PolicyRAGAgent`, `OnboardingAgent`, `EmployeeToolAgent`) into clean modular classes allowed incremental unit testing of individual agent logic before end-to-end graph compilation.
 
-### 3.2 Standard-Conforming MCP Tool Schemas
-- Defining 8 distinct MCP tool schemas with JSON Schema property types, default values, and required constraints was accomplished accurately in a single pass.
-- The generated tools seamlessly supported dual-mode invocation: over JSON-RPC 2.0 HTTP requests and via direct Python client callbacks with unified telemetry logging.
+### 3.2 Standard-Conforming FastMCP Tooling & MultiServerMCPClient
+- Defining 8 distinct MCP tools with `@mcp.tool()` decorators in FastMCP automatically derived standard JSON Schemas from Python type hints and docstrings without manual schema boilerplate.
+- `MultiServerMCPClient` from `langchain-mcp-adapters` streamlined multi-server connectivity, enabling LangChain agents to bind MCP tools directly via `get_langchain_tools()` with support for both synchronous and asynchronous invocations.
 
 ### 3.3 Synthetic Data & Policy Corpus Realism
 - The AI created and expanded 11 realistic corporate policy documents (`POL-REMOTE-2024`, `POL-PTO-2024`, `POL-BEN-2024`, `POL-EXP-2024`, `POL-ETHICS-2024`, `POL-SEC-2024`, `POL-ONB-2024`, `POL-HOL-2024`, `POL-REL-2024`, `POL-FAC-2024`, `POL-EMP-2024`) containing nuanced rules across PTO, holidays, remote work, expenses, data security, benefits, onboarding, equipment, leave, workplace conduct, manager relationships, office locations, and employment classifications.
