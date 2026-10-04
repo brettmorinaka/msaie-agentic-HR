@@ -66,3 +66,47 @@ def test_llm_provider_openrouter_fallback_on_exception(monkeypatch):
     with patch("httpx.Client.post", side_effect=Exception("Connection timed out")):
         res = provider.generate("How many days of international remote work are allowed per year?")
         assert "30 calendar days" in res
+
+def test_llm_provider_classify_intent_openrouter(monkeypatch):
+    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-or-v1-testkey123456789")
+    monkeypatch.setenv("LLM_PROVIDER", "openrouter")
+    monkeypatch.setenv("LLM_MODEL", "openai/gpt-4o-mini")
+
+    provider = LLMProvider()
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "choices": [
+            {
+                "message": {
+                    "role": "assistant",
+                    "content": '```json\n{\n  "workflow": "onboarding",\n  "employee_id": "EMP-NEW-01",\n  "reasoning": "New hire onboarding checklist request."\n}\n```'
+                }
+            }
+        ]
+    }
+
+    with patch("httpx.Client.post", return_value=mock_resp) as mock_post:
+        res = provider.classify_intent("Show onboarding checklist for EMP-NEW-01")
+        assert res["workflow"] == "onboarding"
+        assert res["employee_id"] == "EMP-NEW-01"
+        assert "onboarding" in res["reasoning"].lower()
+        assert mock_post.called
+
+def test_llm_provider_classify_intent_fallback(monkeypatch):
+    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-or-v1-testkey123456789")
+    monkeypatch.setenv("LLM_PROVIDER", "openrouter")
+
+    provider = LLMProvider()
+
+    # When API returns 500 error, gracefully fall back to deterministic classification
+    mock_resp = MagicMock()
+    mock_resp.status_code = 500
+    mock_resp.text = "Internal Server Error"
+
+    with patch("httpx.Client.post", return_value=mock_resp):
+        res = provider.classify_intent("Check my PTO balance for EMP-101", employee_id="EMP-101")
+        assert res["workflow"] == "employee_workflow"
+        assert res["employee_id"] == "EMP-101"
+

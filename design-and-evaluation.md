@@ -187,8 +187,8 @@ class HRAgentState(TypedDict):
 ```
 
 ### 4.2 Graph Topology & Nodes
-1. **`router` Node:** Extracts employee IDs, analyzes query heuristics, and classifies the intent into one of five workflows.
-2. **`guardrails` Node:** Enforces out-of-scope refusals and checks for ambiguity (missing IDs/dates).
+1. **`router` Node:** Utilizes the LLM (`LLMProvider.classify_intent`) to semantically classify incoming user requests into one of five structured workflows (`policy_rag`, `onboarding`, `employee_workflow`, `out_of_scope`, `clarification`), extract employee entities, and log classification reasoning.
+2. **`guardrails` Node:** Enforces out-of-scope refusals and checks for ambiguity (missing IDs/dates), respecting LLM classification.
 3. **Domain Agents:**
    - **`PolicyRAGAgent`:** Decomposes complex queries, searches the policy vector store, formats citations, and extracts verifiable facts.
    - **`OnboardingAgent`:** Verifies new hire checklist milestones (`lookup_employee_profile`), retrieves equipment and benefits deadlines (`search_policy_documents`), and drafts welcome emails (`draft_hr_email`).

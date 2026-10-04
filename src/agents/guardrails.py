@@ -24,11 +24,18 @@ class HRGuardrails:
     """
 
     @staticmethod
-    def check_scope(query: str) -> Tuple[bool, Optional[str]]:
+    def check_scope(query: str, workflow: Optional[str] = None) -> Tuple[bool, Optional[str]]:
         """
         Determines whether a user query falls within HR company policies and workflows.
         Returns: (is_in_scope, refusal_reason_if_out_of_scope)
         """
+        if workflow == "out_of_scope":
+            return False, (
+                "I am the GlobalTech HR Assistant, specialized strictly in internal company policies, "
+                "benefits, onboarding, time-off requests, and employee workflows. "
+                "I cannot assist with questions outside our HR scope."
+            )
+
         q_lower = query.lower()
 
         # Check explicit out of scope triggers
@@ -55,10 +62,16 @@ class HRGuardrails:
         return True, None
 
     @staticmethod
-    def check_ambiguity(query: str, workflow: str) -> Tuple[bool, Optional[str]]:
+    def check_ambiguity(query: str, workflow: Optional[str] = None) -> Tuple[bool, Optional[str]]:
         """
         Checks whether a requested workflow is missing necessary information.
         """
+        if workflow == "clarification":
+            return True, (
+                "To assist with your time off request, please provide your Employee ID (e.g., EMP-101) "
+                "and the target dates or number of days you plan to take."
+            )
+
         q_lower = query.lower()
 
         # Check if user is asking to book or request time off without dates or employee ID

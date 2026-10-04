@@ -37,5 +37,5 @@ def test_operational_trace_structure(orchestrator):
     res = orchestrator.run("What is my PTO balance for EMP-101?")
     trace = res["operational_trace"]
     assert len(trace) >= 2
-    assert any(step.get("step") == "intent_routing" for step in trace)
+    assert any(step.get("step") == "intent_routing" and step.get("classifier") == "llm" for step in trace)
     assert any(step.get("step") == "guardrail_check" for step in trace)

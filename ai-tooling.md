@@ -27,10 +27,11 @@ This document details the AI-assisted engineering tools utilized during the desi
 - **Client Integration:** Implemented **langchain-mcp-adapters** and **MultiServerMCPClient** (`src/mcp/client.py`), allowing seamless tool discovery and LangChain `BaseTool` conversion across SSE, Stdio, and in-process execution.
 - **Dual Transport Integration:** Implemented FastMCP SSE mounting (`/sse`, `/messages`) and standalone stdio subprocess execution (`python -m src.mcp.server --stdio`) with full operational telemetry (tool arguments, return values, and latency).
 
-### 2.3 LangGraph Multi-Agent Orchestration
+### 2.3 LangGraph Multi-Agent Orchestration & LLM Intent Classification
 - **Application:** AI structured the `StateGraph` state machine (`src/agents/orchestrator.py`) using a centralized `HRAgentState` TypedDict.
+- **Semantic Intent Classification:** Replaced brittle keyword heuristics in `_router_node` with dynamic LLM intent classification (`LLMProvider.classify_intent`), enabling the model to categorize queries into structured schemas (`policy_rag`, `onboarding`, `employee_workflow`, `out_of_scope`, `clarification`) with extracted entities and routing rationale.
 - **Workflow Routing:** Defined conditional edges routing between:
-  - Intent classification (`_router_node`)
+  - LLM Intent classification (`_router_node`)
   - Scope and ambiguity guardrails (`_guardrails_node`)
   - Sub-agents: `PolicyRAGAgent`, `OnboardingAgent`, `EmployeeToolAgent`
   - Post-execution synthesis and citation audit (`_synthesizer_node`)

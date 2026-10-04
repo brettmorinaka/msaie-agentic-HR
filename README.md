@@ -21,7 +21,7 @@ An autonomous, multi-agent Human Resources automation system built with **LangGr
 ## 🌟 Key Capabilities
 
 1. **Multi-Agent Orchestration (LangGraph):**
-   - **Intent Router:** Automatically classifies user requests into specialized workflows (`policy_rag`, `onboarding`, `employee_workflow`, `clarification`, `out_of_scope`).
+   - **LLM Intent Router:** Utilizes the LLM to semantically classify user requests into specialized workflows (`policy_rag`, `onboarding`, `employee_workflow`, `clarification`, `out_of_scope`) with entity extraction and routing rationale.
    - **Scope Guardrails:** Detects and politely refuses queries outside the HR domain.
    - **Ambiguity Handler:** Prompts for clarification when critical parameters (e.g., employee ID, leave dates) are missing.
    - **Policy RAG Agent:** Semantic retrieval across multi-format policies with source citations, snippets, and factual grounding.
@@ -87,7 +87,7 @@ msaie-agentic-HR/
 │   ├── eval_dataset.json           # 25 benchmark evaluation test cases
 │   ├── run_eval.py                 # Evaluation benchmark runner & ablation study
 │   └── results.md                  # Comprehensive evaluation results report
-├── tests/                          # 27 automated unit and integration tests
+├── tests/                          # 29 automated unit and integration tests
 ├── .github/workflows/ci.yml        # GitHub Actions CI/CD pipeline
 ├── Dockerfile                      # Container build definition
 ├── render.yaml                     # Render.com deployment manifest
@@ -214,7 +214,7 @@ curl -X POST http://localhost:8000/chat \
 
 ## 🧪 Testing & CI/CD Pipeline
 
-Run the complete automated test suite (27 unit and integration tests):
+Run the complete automated test suite (29 unit and integration tests):
 ```bash
 pytest -v
 ```
@@ -223,7 +223,7 @@ pytest -v
 The automated pipeline defined in `.github/workflows/ci.yml` runs on every push and pull request:
 1. Installs pinned dependencies from `requirements.txt`.
 2. Ingests and verifies the policy corpus.
-3. Runs all 18 automated unit and smoke tests.
+3. Runs all 29 automated unit and smoke tests.
 4. Executes the 25-case evaluation benchmark runner.
 5. Verifies app startup and dynamic MCP tool discovery.
 

@@ -77,46 +77,25 @@ class HROrchestrator:
     # --- Node Implementations ---
 
     def _router_node(self, state: HRAgentState) -> Dict[str, Any]:
-        """Interprets intent and extracts context."""
+        """Classifies intent using the LLM and extracts context."""
         query = state["user_query"].strip()
-        q_lower = query.lower()
-
-        # Extract employee ID if present in query
-        emp_match = re.search(r"EMP-[A-Z0-9-]+", query, re.IGNORECASE)
-        emp_id = state.get("employee_id") or (emp_match.group(0).upper() if emp_match else None)
+        existing_emp_id = state.get("employee_id")
 
         trace = list(state.get("operational_trace", []))
 
-        # Intent classification heuristics
-        if any(w in q_lower for w in ["recipe", "bake", "cook", "quantum physics", "write python", "debug code", "capital of", "two sum"]):
-            workflow = "out_of_scope"
-            reasoning = "Query outside HR domain."
-        elif any(w in q_lower for w in ["onboard", "new hire", "checklist", "first day", "roadmap"]):
-            workflow = "onboarding"
-            reasoning = "Query pertains to new hire onboarding, checklist milestones, or orientation."
-        elif (
-            ("pto" in q_lower or "vacation" in q_lower or "time off" in q_lower or "leave" in q_lower) and
-            any(w in q_lower for w in ["balance", "submit", "take", "book", "file", "confirm"]) and
-            not any(w in q_lower for w in ["how do", "rollover", "interact", "what is the annual", "accrual tier"])
-        ):
-            workflow = "employee_workflow"
-            reasoning = "Query requests employee PTO balance check or leave ticket action."
-        elif (
-            ("stipend" in q_lower or "equipment" in q_lower or "allowance" in q_lower or "profile" in q_lower or "benefits" in q_lower or "expense" in q_lower) and
-            (emp_id is not None or any(w in q_lower for w in ["my", "check", "remaining", "used", "complies", "compliance"])) and
-            not any(w in q_lower for w in ["am i eligible", "what are the deductible", "daily maximum allowance"])
-        ):
-            workflow = "employee_workflow"
-            reasoning = "Query requires employee tool execution (equipment balance, profile lookup, benefits election, expense check)."
-        elif "confirm" in q_lower and "ticket" in q_lower:
-            workflow = "employee_workflow"
-            reasoning = "User confirming pending ticket creation."
-        else:
-            workflow = "policy_rag"
-            reasoning = "Query requests HR policy guidance, compliance rules, or benefits information."
+        # Perform LLM semantic intent classification
+        classification = self.llm.classify_intent(query=query, employee_id=existing_emp_id)
+
+        workflow = classification.get("workflow", "policy_rag")
+        reasoning = classification.get("reasoning", "LLM-classified intent")
+
+        # Extract or resolve employee ID
+        emp_match = re.search(r"EMP-[A-Z0-9-]+", query, re.IGNORECASE)
+        emp_id = existing_emp_id or classification.get("employee_id") or (emp_match.group(0).upper() if emp_match else None)
 
         trace.append({
             "step": "intent_routing",
+            "classifier": "llm",
             "detected_workflow": workflow,
             "employee_id": emp_id,
             "reasoning": reasoning,
@@ -137,8 +116,8 @@ class HROrchestrator:
         trace = list(state.get("operational_trace", []))
 
         # Check scope
-        in_scope, refusal = HRGuardrails.check_scope(query)
-        if not in_scope:
+        in_scope, refusal = HRGuardrails.check_scope(query, workflow=workflow)
+        if not in_scope or workflow == "out_of_scope":
             trace.append({
                 "step": "guardrail_scope_check",
                 "status": "REFUSED_OUT_OF_SCOPE",
@@ -146,13 +125,17 @@ class HROrchestrator:
             })
             return {
                 "workflow": "out_of_scope",
-                "final_response": refusal,
+                "final_response": refusal or (
+                    "I am the GlobalTech HR Assistant, specialized strictly in internal company policies, "
+                    "benefits, onboarding, time-off requests, and employee workflows. "
+                    "I cannot assist with questions outside our HR scope."
+                ),
                 "operational_trace": trace
             }
 
         # Check ambiguity
-        is_ambiguous, clarification = HRGuardrails.check_ambiguity(query, workflow)
-        if is_ambiguous:
+        is_ambiguous, clarification = HRGuardrails.check_ambiguity(query, workflow=workflow)
+        if is_ambiguous or workflow == "clarification":
             trace.append({
                 "step": "guardrail_ambiguity_check",
                 "status": "CLARIFICATION_REQUIRED",
@@ -160,7 +143,10 @@ class HROrchestrator:
             })
             return {
                 "workflow": "clarification",
-                "final_response": clarification,
+                "final_response": clarification or (
+                    "To assist with your request, please provide your Employee ID (e.g., EMP-101) "
+                    "and the target dates or number of days you plan to take."
+                ),
                 "operational_trace": trace
             }
 

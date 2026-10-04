@@ -106,6 +106,210 @@ class LLMProvider:
         # 3. Built-in Deterministic Synthesis Engine
         return self._deterministic_synthesize(prompt, system_prompt)
 
+    def classify_intent(self, query: str, employee_id: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Classifies incoming user query using the LLM to determine the appropriate workflow/subagent.
+        Returns a dict:
+        {
+            "workflow": "policy_rag" | "onboarding" | "employee_workflow" | "out_of_scope" | "clarification",
+            "employee_id": Optional[str],
+            "reasoning": str
+        }
+        """
+        system_prompt = (
+            "You are the GlobalTech Multi-Agent HR Intent Classifier.\n"
+            "Analyze the incoming user request and categorize it into exactly ONE of the following 5 workflows:\n"
+            "1. 'policy_rag': Informational inquiries about company policies, rules, benefits packages, healthcare plans, "
+            "PTO accrual rules, travel reimbursement guidelines, remote work day caps, ethics/gift policies, or workplace conduct.\n"
+            "2. 'onboarding': New hire onboarding workflows, milestones, 30/60/90-day checklists, welcome emails, orientation roadmap, or new hire setup.\n"
+            "3. 'employee_workflow': Transactional self-service actions for employees. Includes checking personal PTO balances, "
+            "checking remaining equipment allowance or benefits elections, looking up employee profiles, submitting leave/ticket requests, "
+            "confirming pending tickets, or verifying expense compliance against policy.\n"
+            "4. 'out_of_scope': Requests that are completely outside the HR, company policy, and employee domain (such as general coding, "
+            "python algorithms, cooking recipes, weather, quantum physics, general trivia, personal advice).\n"
+            "5. 'clarification': Incomplete or ambiguous action requests that cannot proceed without missing critical details (e.g., asking "
+            "to take or book time off without providing dates, duration, or employee ID).\n\n"
+            "Respond ONLY with a valid JSON object matching this schema:\n"
+            "{\n"
+            '  "workflow": "policy_rag" | "onboarding" | "employee_workflow" | "out_of_scope" | "clarification",\n'
+            '  "employee_id": "<extracted employee ID like EMP-101, EMP-NEW-01, or null>",\n'
+            '  "reasoning": "<concise explanation of why this workflow was chosen>"\n'
+            "}"
+        )
+        user_prompt = f"User Request: {query}\nActive Employee ID: {employee_id or 'None'}"
+
+        # 1. OpenRouter (Primary Provider)
+        if self.active_provider == "openrouter" and self.openrouter_key:
+            try:
+                import httpx
+                headers = {
+                    "Authorization": f"Bearer {self.openrouter_key}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://github.com/your-org/msaie-agentic-HR",
+                    "X-Title": "GlobalTech HR Multi-Agent System"
+                }
+                payload = {
+                    "model": self.model,
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    "temperature": 0.0
+                }
+                with httpx.Client(timeout=15.0) as client:
+                    resp = client.post(self.openrouter_url, headers=headers, json=payload)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        choices = data.get("choices", [])
+                        if choices and "message" in choices[0] and "content" in choices[0]["message"]:
+                            content = choices[0]["message"]["content"]
+                            parsed = self._parse_json_classification(content)
+                            if parsed:
+                                if employee_id and not parsed.get("employee_id"):
+                                    parsed["employee_id"] = employee_id
+                                return parsed
+                    else:
+                        print(f"[!] OpenRouter classification API returned HTTP {resp.status_code}: {resp.text}")
+            except Exception as e:
+                print(f"[!] OpenRouter classification failed: {e}; falling back to deterministic classification.")
+
+        # 2. OpenAI Fallback
+        elif self.active_provider == "openai" and self.openai_key:
+            try:
+                import httpx
+                headers = {"Authorization": f"Bearer {self.openai_key}", "Content-Type": "application/json"}
+                payload = {
+                    "model": self.model if "gpt" in self.model else "gpt-4o-mini",
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    "temperature": 0.0
+                }
+                with httpx.Client(timeout=15.0) as client:
+                    resp = client.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+                    if resp.status_code == 200:
+                        content = resp.json()["choices"][0]["message"]["content"]
+                        parsed = self._parse_json_classification(content)
+                        if parsed:
+                            if employee_id and not parsed.get("employee_id"):
+                                parsed["employee_id"] = employee_id
+                            return parsed
+            except Exception:
+                pass
+
+        # 3. Built-in Deterministic Classifier Fallback
+        return self._deterministic_classify_intent(query, employee_id)
+
+    def _parse_json_classification(self, text: str) -> Optional[Dict[str, Any]]:
+        """Safely parses LLM JSON output with code fence stripping."""
+        if not text:
+            return None
+        cleaned = text.strip()
+        if cleaned.startswith("```"):
+            cleaned = re.sub(r"^```[a-zA-Z]*\n?", "", cleaned)
+            cleaned = re.sub(r"\n?```$", "", cleaned)
+        try:
+            parsed = json.loads(cleaned.strip())
+            valid_workflows = {"policy_rag", "onboarding", "employee_workflow", "out_of_scope", "clarification"}
+            if isinstance(parsed, dict) and parsed.get("workflow") in valid_workflows:
+                return {
+                    "workflow": parsed["workflow"],
+                    "employee_id": parsed.get("employee_id"),
+                    "reasoning": parsed.get("reasoning", "LLM-classified intent")
+                }
+        except Exception:
+            m = re.search(r'"workflow"\s*:\s*"([^"]+)"', cleaned)
+            if m and m.group(1) in {"policy_rag", "onboarding", "employee_workflow", "out_of_scope", "clarification"}:
+                return {
+                    "workflow": m.group(1),
+                    "employee_id": None,
+                    "reasoning": "Extracted from LLM response"
+                }
+        return None
+
+    def _deterministic_classify_intent(self, query: str, employee_id: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Deterministic intent classification engine.
+        Emulates LLM classification when running offline, in test environments, or on network failure.
+        """
+        q_lower = query.lower().strip()
+
+        emp_match = re.search(r"EMP-[A-Z0-9-]+", query, re.IGNORECASE)
+        detected_emp_id = employee_id or (emp_match.group(0).upper() if emp_match else None)
+
+        # 1. Out-of-Scope Detection
+        out_of_scope_patterns = [
+            "recipe", "bake", "cook", "quantum physics", "write python", "debug code",
+            "capital of", "weather tomorrow", "two sum", "super bowl", "cryptocurrency"
+        ]
+        if any(p in q_lower for p in out_of_scope_patterns):
+            return {
+                "workflow": "out_of_scope",
+                "employee_id": detected_emp_id,
+                "reasoning": "Query is outside the HR and employee operations domain."
+            }
+
+        # 2. Ambiguity / Clarification Check
+        is_requesting_time_off = (
+            any(w in q_lower for w in ["time off", "pto", "vacation", "leave"]) and
+            (bool(re.search(r"\b(?:book|request|take)\b", q_lower)) or "want to take" in q_lower)
+        )
+        is_info_question = bool(re.search(r"^(?:how|what|can|when|who|where)\b", q_lower))
+        if is_requesting_time_off and not is_info_question:
+            has_days_or_dates = bool(re.search(r"\d+\s*(?:day|days|week|weeks|hours)", q_lower)) or bool(re.search(r"\d{4}-\d{2}-\d{2}", query))
+            if not detected_emp_id and not has_days_or_dates:
+                return {
+                    "workflow": "clarification",
+                    "employee_id": None,
+                    "reasoning": "User requested time off but did not specify employee ID or dates."
+                }
+
+        # 3. Onboarding Workflow
+        onboarding_patterns = [
+            "onboard", "new hire", "checklist", "first day", "roadmap", "welcome onboarding email",
+            "welcome email", "new hire benefits election"
+        ]
+        if any(p in q_lower for p in onboarding_patterns):
+            return {
+                "workflow": "onboarding",
+                "employee_id": detected_emp_id,
+                "reasoning": "Query pertains to new hire onboarding, checklist milestones, or orientation."
+            }
+
+        # 4. Employee Workflow (Transactional Tools & Profile)
+        if "confirm" in q_lower and "ticket" in q_lower:
+            return {
+                "workflow": "employee_workflow",
+                "employee_id": detected_emp_id,
+                "reasoning": "User is confirming submission of a pending HR ticket."
+            }
+
+        is_pto_action = (
+            ("pto" in q_lower or "vacation" in q_lower or "time off" in q_lower or "leave" in q_lower) and
+            any(w in q_lower for w in ["balance", "submit", "take", "book", "file", "confirm"]) and
+            not any(w in q_lower for w in ["how do", "rollover", "interact", "what is the annual", "accrual tier"])
+        )
+        is_employee_tool_action = (
+            ("stipend" in q_lower or "equipment" in q_lower or "allowance" in q_lower or "profile" in q_lower or "benefits" in q_lower or "expense" in q_lower) and
+            (detected_emp_id is not None or any(w in q_lower for w in ["my", "check", "remaining", "used", "complies", "compliance"])) and
+            not any(w in q_lower for w in ["am i eligible", "what are the deductible", "daily maximum allowance"])
+        )
+
+        if is_pto_action or is_employee_tool_action:
+            return {
+                "workflow": "employee_workflow",
+                "employee_id": detected_emp_id,
+                "reasoning": "Query requires employee tool execution or personal record lookup."
+            }
+
+        # 5. Default: Policy RAG
+        return {
+            "workflow": "policy_rag",
+            "employee_id": detected_emp_id,
+            "reasoning": "Query requests company policy, benefits rules, or HR guidelines."
+        }
+
     def _deterministic_synthesize(self, prompt: str, system_prompt: str) -> str:
         """
         Deterministic knowledge-based synthesis engine.
