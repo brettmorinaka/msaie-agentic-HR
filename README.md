@@ -8,6 +8,9 @@
 
 An autonomous, multi-agent Human Resources automation system built with **LangGraph** and the **Model Context Protocol (MCP)**. The system handles **new hire onboarding**, **HR policy Q&A (RAG with precise citations)**, and **employee self-service tool execution** with explicit action safety guardrails.
 
+> [!NOTE]
+> **Live Deployment & Cold-Start Notice:** The live application is hosted at [https://msaie-agentic-hr.onrender.com](https://msaie-agentic-hr.onrender.com). This application is deployed on a free instance of Render and spins down during inactivity, which can delay initial requests by 50 seconds or more while the container spins back up.
+
 ---
 
 ## 📚 Project Documentation Index
@@ -257,13 +260,13 @@ python evaluation/run_eval.py
 ## 🚢 Deployment Guide (Render, Railway, Docker)
 
 ### Render.com Deployment
-The application is pre-configured with `render.yaml`:
+The application is pre-configured with `render.yaml` and deployed at [https://msaie-agentic-hr.onrender.com](https://msaie-agentic-hr.onrender.com):
 1. Connect your GitHub repository to Render.
 2. Render will automatically detect `render.yaml` and configure:
    - Service: `hr-agentic-web` (Streamlit Web App + LangGraph Orchestrator)
    - Port: `$PORT` (defaults to 8501)
 3. Set environment variable `OPENROUTER_API_KEY` (optional; system falls back to built-in synthesis if omitted).
-4. **Cold-Start Behavior:** On Render's free tier, inactive services spin down after 15 minutes of inactivity. First request will experience a cold-start initialization of ~1-2 seconds while the container resumes.
+4. **Free Instance Inactivity & Cold-Start Behavior:** This application is deployed on a free instance of Render and spins down during inactivity, which can delay requests by 50 seconds or more while the container provisions and boots. Subsequent requests respond with sub-second latency.
 
 ### Docker Deployment
 ```bash
