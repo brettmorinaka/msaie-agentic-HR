@@ -89,9 +89,8 @@ class HROrchestrator:
         workflow = classification.get("workflow", "policy_rag")
         reasoning = classification.get("reasoning", "LLM-classified intent")
 
-        # Extract or resolve employee ID strictly from query text or active session context
-        emp_match = re.search(r"EMP-[A-Z0-9-]+", query, re.IGNORECASE)
-        emp_id = existing_emp_id or (emp_match.group(0).upper() if emp_match else None)
+        # Resolve employee ID strictly from active session context; do not extract from query text
+        emp_id = existing_emp_id
 
         trace.append({
             "step": "intent_routing",

@@ -29,11 +29,8 @@ class EmployeeToolAgent:
             "action_safety_status": "SAFE"
         }
 
-        # 1. Identify employee ID strictly from state or query
+        # 1. Identify employee ID strictly from active session state
         emp_id = state.get("employee_id")
-        if not emp_id:
-            emp_match = re.search(r"EMP-[A-Z0-9-]+", query, re.IGNORECASE)
-            emp_id = emp_match.group(0).upper() if emp_match else None
 
         if not emp_id:
             updates["final_response"] = (

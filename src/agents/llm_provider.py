@@ -235,8 +235,7 @@ class LLMProvider:
         """
         q_lower = query.lower().strip()
 
-        emp_match = re.search(r"EMP-[A-Z0-9-]+", query, re.IGNORECASE)
-        detected_emp_id = employee_id or (emp_match.group(0).upper() if emp_match else None)
+        detected_emp_id = employee_id
 
         # 1. Out-of-Scope Detection
         out_of_scope_patterns = [
@@ -326,6 +325,72 @@ class LLMProvider:
             user_query = prompt.strip()
 
         q_lower = user_query.lower()
+
+        # Check for active session employee context
+        has_employee_context = "Active Employee Profile:" in prompt
+        emp_id_match = re.search(r"Employee ID:\s*(EMP-[A-Z0-9-]+)", prompt)
+        full_name_match = re.search(r"Full Name:\s*([^\n]+)", prompt)
+        tenure_match = re.search(r"Tenure:\s*([0-9.]+)\s*years", prompt)
+        pto_balance_match = re.search(r"Current PTO Balance:\s*([0-9.]+)\s*days", prompt)
+        work_loc_match = re.search(r"Work Location:\s*([^\n]+)", prompt)
+        prob_match = re.search(r"Probation Completed:\s*(Yes|No)", prompt)
+        medical_match = re.search(r"Medical:\s*([^,\n]+)", prompt)
+
+        # 0. Active Employee Personalized Responses
+        if has_employee_context and emp_id_match:
+            emp_id_val = emp_id_match.group(1)
+            emp_name_val = full_name_match.group(1).strip() if full_name_match else "Employee"
+            tenure_val = float(tenure_match.group(1)) if tenure_match else 2.0
+            balance_val = float(pto_balance_match.group(1)) if pto_balance_match else 0.0
+
+            # 0a. Personalized PTO Policy Query
+            if ("pto" in q_lower or "vacation" in q_lower or "time off" in q_lower) and not (("workation" in q_lower or "france" in q_lower) and "meal" in q_lower):
+                if tenure_val < 2.0:
+                    tier_desc = "**Tier 1 (0 to 2 years tenure)**, accruing **15 days (120 hours)** of paid time off per calendar year (5.0 hours per pay period)"
+                elif tenure_val <= 5.0:
+                    tier_desc = "**Tier 2 (2 to 5 years tenure)**, accruing **20 days (160 hours)** of paid time off per calendar year (6.67 hours per pay period)"
+                else:
+                    tier_desc = "**Tier 3 (5+ years tenure)**, accruing **25 days (200 hours)** of paid time off per calendar year (8.33 hours per pay period)"
+
+                return (
+                    f"### PTO Policy & Accrual Dossier: {emp_name_val} ({emp_id_val})\n\n"
+                    "**Your Personalized PTO Policy & Accrual:**\n"
+                    f"• **Tenure & Accrual Tier:** With **{tenure_val} years of service**, you are in {tier_desc} ([POL-PTO-2024: 2. Annual PTO Accrual Tiers]).\n"
+                    f"• **Current Available Balance:** You currently have **{balance_val} days** of available PTO.\n\n"
+                    "**Key Policy Rules Applicable to You:**\n"
+                    "• **Year-End Rollover:** You may roll over a maximum of **5 unused PTO days** (40 hours) into the next calendar year; "
+                    "any rolled-over days must be used by **March 31** ([POL-PTO-2024: 4. Year-End Rollover]).\n"
+                    "• **Advance Notice Requirements:** 1–2 consecutive days require 48 hours notice; 3–5 consecutive days require 14 calendar days advance notice; "
+                    "leaves longer than 5 days require 30 calendar days notice ([POL-PTO-2024: 3. Request and Approval Process]).\n"
+                    "• **Manager Approval:** Submit requests via the GlobalTech HR Portal for approval by your manager ([POL-PTO-2024: 3. Request and Approval Process])."
+                )
+
+            # 0b. Personalized Medical Deductible / Benefits Query
+            if "deductible" in q_lower or ("medical" in q_lower and "plan" in q_lower) or ("health" in q_lower and "insurance" in q_lower):
+                med_plan = medical_match.group(1).strip() if medical_match else "Premier PPO Plan"
+                if "HDHP" in med_plan:
+                    ded_info = "features a **$1,500 individual / $3,000 family** annual deductible with 80% coinsurance and eligible employer HSA contributions"
+                else:
+                    ded_info = "features a **$500 individual / $1,000 family** annual deductible, 90% in-network coinsurance, and 100% covered preventative care"
+                return (
+                    f"### Medical Plan Deductibles: {emp_name_val} ({emp_id_val})\n\n"
+                    f"**Your Coverage & Deductible:**\n"
+                    f"• **Enrolled Plan:** You are enrolled in the **{med_plan}**.\n"
+                    f"• **Deductible & Benefits:** Your plan {ded_info} ([POL-BEN-2024: 2. Medical Insurance Plans]).\n"
+                    "• **Preventative Care:** Routine annual checkups and preventative screenings are covered at 100% with no deductible applied ([POL-BEN-2024: 2.1])."
+                )
+
+            # 0c. Personalized Remote Work / Allowance Query
+            if ("remote" in q_lower or "equipment" in q_lower or "stipend" in q_lower) and not (("workation" in q_lower or "france" in q_lower) and "meal" in q_lower):
+                loc_val = work_loc_match.group(1).strip() if work_loc_match else "Remote"
+                prob_val = prob_match.group(1).strip() if prob_match else "Yes"
+                return (
+                    f"### Remote Work & Equipment Status: {emp_name_val} ({emp_id_val})\n\n"
+                    "**Your Work Arrangement & Equipment Eligibility:**\n"
+                    f"• **Current Arrangement:** {loc_val} (Probation Completed: {prob_val}).\n"
+                    f"• **Remote Status:** {'Fully eligible for remote arrangement and up to 30 calendar days international workation' if prob_val == 'Yes' else 'Currently in 90-day probationary period; remote status requires manager approval'} ([POL-REMOTE-2024: 2. Eligibility Requirements]).\n"
+                    "• **Equipment Allowance:** Newly approved remote employees receive a one-time allowance of up to **$750 USD** for home office gear within 60 days ([POL-REMOTE-2024: 3. Home Office Equipment Allowance])."
+                )
 
         # 1. Multi-doc: International workation + PTO + meals
         if ("workation" in q_lower or "abroad" in q_lower or "france" in q_lower or "international" in q_lower) and ("expense" in q_lower or "meal" in q_lower):
