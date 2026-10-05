@@ -98,3 +98,46 @@ def test_generic_policy_query_remains_unpersonalized(orchestrator):
     assert "Marcus Johnson" not in res["answer"]
     tool_names = [t.get("tool_name") for t in res["mcp_tool_trace"]]
     assert "lookup_employee_profile" not in tool_names
+
+
+def test_working_in_another_city_is_in_scope_and_calls_remote_policy(orchestrator):
+    """
+    Verifies that inquiries about working in another city are treated as in-scope
+    and correctly retrieve the remote work / workation / relocation policy.
+    """
+    res = orchestrator.run("Can an employee work in another city?", employee_id=None)
+    assert res["workflow"] == "policy_rag"
+    assert res["workflow"] != "out_of_scope"
+    tool_names = [t.get("tool_name") for t in res["mcp_tool_trace"]]
+    assert "search_policy_documents" in tool_names
+    doc_ids = [c["document_id"] for c in res.get("citations", [])]
+    assert "POL-REMOTE-2024" in doc_ids
+    assert "30 calendar days" in res["answer"] or "workation" in res["answer"].lower() or "relocation" in res["answer"].lower()
+
+
+def test_subagent_tool_calling_bounded_to_max_two_calls(orchestrator):
+    """
+    Verifies that PolicyRAGAgent, EmployeeToolAgent, and OnboardingAgent enforce
+    bounded tool execution (at most 2 tool calls per subagent turn) to prevent context bloat.
+    """
+    # 1. Complex Policy Query
+    res_policy = orchestrator.run(
+        "Can I work remotely from France for 3 weeks and expense my meals?",
+        employee_id=None
+    )
+    assert len(res_policy["mcp_tool_trace"]) <= 2
+
+    # 2. Employee Workflow Query
+    res_emp = orchestrator.run(
+        "Check my pto balance and see if I can take 5 days off next month",
+        employee_id="EMP-101"
+    )
+    assert len(res_emp["mcp_tool_trace"]) <= 2
+
+    # 3. Onboarding Workflow Query
+    res_onb = orchestrator.run(
+        "Draft welcome onboarding email for EMP-NEW-01",
+        employee_id="EMP-NEW-01"
+    )
+    assert len(res_onb["mcp_tool_trace"]) <= 2
+

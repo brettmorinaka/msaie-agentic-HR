@@ -63,32 +63,59 @@ class PolicyRAGAgent:
                     f"Home Office Equipment Allowance: ${remaining_stipend:.2f} remaining out of ${stipend_limit:.2f}"
                 )
 
-        # 2. Query decomposition for multi-topic/multi-document queries
-        subqueries = [query]
-        q_lower = query.lower()
-        if ("pto" in q_lower or "vacation" in q_lower) and ("expense" in q_lower or "meal" in q_lower) and ("remote" in q_lower or "workation" in q_lower):
-            subqueries = [
-                "temporary international remote work workation policy 30 days limit",
-                "strictly non reimbursable expenditures travel expense meals"
-            ]
-        elif ("stipend" in q_lower or "allowance" in q_lower) and "remote" in q_lower:
-            subqueries = ["home office equipment allowance stipend for remote work"]
-        elif ("pto" in q_lower or "vacation" in q_lower) and not any(w in q_lower for w in ["international", "france", "rollover", "parental"]):
-            subqueries = ["annual PTO accrual tiers rollover guidelines notice process"]
+        # 2. LLM-Based Tool Planning (bounded to prevent back-and-forth context bloat)
+        available_tools = [
+            {
+                "name": "search_policy_documents",
+                "description": "Semantic search in HR policy database. Returns relevant policy text chunks, citations, and sections.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "query": {"type": "string", "description": "Targeted search query for policy retrieval"},
+                        "top_k": {"type": "integer", "default": 3}
+                    },
+                    "required": ["query"]
+                }
+            },
+            {
+                "name": "get_policy_section",
+                "description": "Retrieve full text and metadata for a specific section within an HR policy document.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "document_id": {"type": "string"},
+                        "section_title": {"type": "string"}
+                    },
+                    "required": ["document_id", "section_title"]
+                }
+            }
+        ]
+
+        planned_calls = self.llm.plan_tool_calls(
+            agent_name="PolicyRAGAgent",
+            user_query=query,
+            available_tools=available_tools,
+            context={"employee_id": emp_id, "has_profile": bool(employee_context_str)},
+            max_tool_calls=2
+        )
 
         retrieved_all = []
-        for sq in subqueries:
-            tool_res = self.mcp.call_tool("search_policy_documents", {"query": sq, "top_k": 3})
+        for plan in planned_calls[:2]:
+            tool_name = plan.get("tool_name", "search_policy_documents")
+            args = plan.get("arguments", {"query": query, "top_k": 3})
+            tool_res = self.mcp.call_tool(tool_name, args)
             updates["tool_calls"].append(tool_res)
             updates["operational_trace"].append({
                 "agent": "PolicyRAGAgent",
-                "action": "search_policy_documents",
-                "arguments": {"query": sq, "top_k": 3},
+                "action": tool_name,
+                "arguments": args,
                 "status": tool_res["status"],
-                "results_count": len(tool_res.get("output", [])) if isinstance(tool_res.get("output"), list) else 0
+                "results_count": len(tool_res.get("output", [])) if isinstance(tool_res.get("output"), list) else 1
             })
             if isinstance(tool_res.get("output"), list):
                 retrieved_all.extend(tool_res["output"])
+            elif isinstance(tool_res.get("output"), dict) and "text" in tool_res["output"]:
+                retrieved_all.append(tool_res["output"])
 
         # Deduplicate chunks by chunk_id
         seen_chunks = set()

@@ -8,7 +8,9 @@ HR_DOMAINS = [
     "expense", "travel", "reimburse", "per diem", "hotel", "flight", "mileage", "meal",
     "conduct", "harassment", "ethics", "reporting", "whistleblower", "conflict of interest", "moonlighting", "gift",
     "onboard", "new hire", "checklist", "training", "profile", "ticket", "manager", "probation", "performance",
-    "payroll", "salary", "compensation", "hr", "policy", "employee"
+    "payroll", "salary", "compensation", "hr", "policy", "employee",
+    "work", "working", "city", "state", "country", "relocate", "relocation", "location", "transfer", "abroad",
+    "move", "moving", "residence", "domestic", "international"
 ]
 
 OUT_OF_SCOPE_TRIGGERS = [
@@ -46,6 +48,10 @@ class HRGuardrails:
                     "benefits, onboarding, time-off requests, and employee workflows. "
                     "I cannot assist with questions outside our HR scope."
                 )
+
+        # If LLM classified the query into an HR workflow, it is in scope
+        if workflow in ["policy_rag", "employee_workflow", "onboarding"]:
+            return True, None
 
         has_hr_keyword = any(kw in q_lower for kw in HR_DOMAINS)
         has_emp_id = bool(re.search(r"EMP-\w+", query, re.IGNORECASE))
