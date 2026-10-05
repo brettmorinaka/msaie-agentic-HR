@@ -129,12 +129,10 @@ def main():
         st.caption("Click any demo task to immediately execute the multi-agent workflow:")
 
         demo_tasks = [
-            ("🚀 Demo 1: Onboarding Roadmap", "Help with onboarding checklist and draft welcome email for EMP-NEW-01"),
-            ("🏖️ Demo 2: PTO Balance & Request", "Check my PTO balance for EMP-101 and help me request 3 days off"),
+            ("🚀 Demo 1: Onboarding Roadmap", "Help with onboarding checklist and draft welcome email for the new employee"),
+            ("🏖️ Demo 2: PTO Balance & Request", "Check my PTO balance and help me request 3 days off"),
             ("🌍 Demo 3: Multi-Doc Policy Question", "Can I expense meals while working remotely on PTO from France?"),
-            ("💻 Demo 4: Remote Work Allowance", "What is the home office equipment allowance for EMP-102 and am I eligible?"),
-            ("🔒 Demo 5: Action Safety Guardrail", "Submit request to take 3 days PTO for EMP-101"),
-            ("🚫 Demo 6: Out-of-Scope Guardrail", "How do I bake chocolate chip cookies?")
+            ("💻 Demo 4: Remote Work Allowance", "What is the home office equipment allowance and am I eligible?")
         ]
 
         for label, query in demo_tasks:
