@@ -6,11 +6,10 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 from concurrent.futures import ThreadPoolExecutor
 
-import httpx
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_core.tools import BaseTool, StructuredTool
 
-from src.config import MCP_SERVER_URL, MCP_TRANSPORT
+from src.config import MCP_TRANSPORT
 from src.mcp.tools import mcp, MCP_TOOL_DEFINITIONS, TOOL_MAP
 
 
@@ -55,15 +54,15 @@ class ToolCallRecord:
 
 class MCPClient:
     """
-    Client for interacting with Model Context Protocol (MCP) servers.
-    Utilizes langchain-mcp-adapters and MultiServerMCPClient for multi-server discovery,
-    connection management, and LangChain tool integration with operational telemetry.
+    Client for interacting with Model Context Protocol (MCP) servers via stdio transport.
+    Utilizes langchain-mcp-adapters and MultiServerMCPClient for subprocess stdio
+    connection management and LangChain tool integration with operational telemetry.
     """
 
     def __init__(
         self,
-        server_url: str = MCP_SERVER_URL,
-        prefer_http: bool = True,
+        server_url: Optional[str] = None,
+        prefer_http: bool = False,
         connections: Optional[Dict[str, Any]] = None
     ):
         self.server_url = server_url
@@ -72,24 +71,15 @@ class MCPClient:
         self._cached_tools: Optional[List[Dict[str, Any]]] = None
         self._langchain_tools: Optional[List[BaseTool]] = None
 
-        # Build MultiServerMCPClient connection configurations
+        # Build MultiServerMCPClient connection configurations exclusively using stdio transport
         if connections is not None:
             self.connections = connections
-        elif self.prefer_http:
-            base_url = self.server_url.rstrip("/")
-            sse_url = f"{base_url}/sse/sse" if not base_url.endswith("/sse") else base_url
-            self.connections = {
-                "hr_mcp_server": {
-                    "transport": "sse",
-                    "url": sse_url
-                }
-            }
         else:
             self.connections = {
                 "hr_mcp_server": {
                     "transport": "stdio",
                     "command": sys.executable,
-                    "args": ["-m", "src.mcp.server", "--stdio"]
+                    "args": ["-m", "src.mcp.server"]
                 }
             }
 
@@ -97,19 +87,17 @@ class MCPClient:
         self.multi_server_client = MultiServerMCPClient(connections=self.connections)
 
     def is_server_reachable(self) -> bool:
-        """Check if the remote MCP HTTP server is reachable."""
+        """Check if the MCP stdio server process is reachable and operational."""
         try:
-            health_url = self.server_url.replace("/mcp", "/health")
-            with httpx.Client(timeout=1.5) as client:
-                res = client.get(health_url)
-                return res.status_code == 200
+            tools = self.list_tools()
+            return len(tools) > 0
         except Exception:
             return False
 
     def get_langchain_tools(self) -> List[BaseTool]:
         """
         Retrieve all available tools converted to LangChain BaseTool objects.
-        Attempts MultiServerMCPClient discovery first, falling back to FastMCP tool registry.
+        Discovers tools over the MCP stdio transport, falling back to FastMCP registry.
         """
         if self._langchain_tools is not None:
             return self._langchain_tools
@@ -149,24 +137,26 @@ class MCPClient:
         return self._langchain_tools
 
     def list_tools(self) -> List[Dict[str, Any]]:
-        """Discover tools from the MCP server using MultiServerMCPClient or FastMCP registry."""
+        """Discover tools from the MCP server using MultiServerMCPClient over stdio."""
         if self._cached_tools is not None:
             return self._cached_tools
 
-        # Try HTTP discovery first if enabled and reachable
-        if self.prefer_http and self.is_server_reachable():
-            try:
-                tools_url = self.server_url.replace("/mcp", "/mcp/tools")
-                with httpx.Client(timeout=2.0) as client:
-                    res = client.get(tools_url)
-                    if res.status_code == 200:
-                        data = res.json()
-                        self._cached_tools = data.get("tools", [])
-                        return self._cached_tools
-            except Exception:
-                pass
+        try:
+            lc_tools = self.get_langchain_tools()
+            if lc_tools:
+                self._cached_tools = [
+                    {
+                        "name": t.name,
+                        "description": t.description,
+                        "inputSchema": getattr(t, "args_schema", None).schema() if getattr(t, "args_schema", None) else {}
+                    }
+                    for t in lc_tools
+                ]
+                return self._cached_tools
+        except Exception:
+            pass
 
-        # Return FastMCP tool definitions
+        # Fallback to FastMCP tool definitions
         self._cached_tools = [
             {
                 "name": t["name"],
@@ -177,61 +167,73 @@ class MCPClient:
         ]
         return self._cached_tools
 
+    @staticmethod
+    def _extract_tool_result(raw_res: Any) -> Any:
+        """Helper to extract structured payload from LangChain / MCP tool execution."""
+        if isinstance(raw_res, tuple) and len(raw_res) > 1 and isinstance(raw_res[1], dict) and "structured_content" in raw_res[1]:
+            return raw_res[1]["structured_content"].get("result")
+        if isinstance(raw_res, tuple) and len(raw_res) > 0:
+            first = raw_res[0]
+            if isinstance(first, list) and len(first) > 0:
+                item = first[0]
+                text_val = item.get("text") if isinstance(item, dict) else getattr(item, "text", None)
+                if text_val:
+                    try:
+                        return json.loads(text_val)
+                    except Exception:
+                        return text_val
+            elif isinstance(first, dict) and "text" in first:
+                try:
+                    return json.loads(first["text"])
+                except Exception:
+                    return first["text"]
+        if isinstance(raw_res, list) and len(raw_res) > 0:
+            first = raw_res[0]
+            text_val = first.get("text") if isinstance(first, dict) else getattr(first, "text", None)
+            if text_val:
+                try:
+                    return json.loads(text_val)
+                except Exception:
+                    return text_val
+        if isinstance(raw_res, str):
+            try:
+                return json.loads(raw_res)
+            except Exception:
+                return raw_res
+        return raw_res
+
     def call_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Execute an MCP tool via the MCP protocol.
+        Execute an MCP tool via the MCP stdio transport.
         Maintains operational telemetry, latency tracking, and action safety audit.
         """
         start_time = time.perf_counter()
-        use_http = self.prefer_http and self.is_server_reachable()
         result = None
         status = "success"
 
-        if use_http:
-            try:
-                payload = {
-                    "jsonrpc": "2.0",
-                    "id": len(self.call_history) + 1,
-                    "method": "tools/call",
-                    "params": {
-                        "name": tool_name,
-                        "arguments": arguments
-                    }
-                }
-                with httpx.Client(timeout=10.0) as client:
-                    resp = client.post(self.server_url, json=payload)
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        if "result" in data:
-                            content = data["result"].get("content", [])
-                            if content and content[0].get("type") == "text":
-                                try:
-                                    result = json.loads(content[0]["text"])
-                                except Exception:
-                                    result = content[0]["text"]
-                            if data["result"].get("isError"):
-                                status = "error"
-                        elif "error" in data:
-                            result = {"error": data["error"].get("message", "Unknown error")}
-                            status = "error"
-                    else:
-                        status = "error"
-                        result = {"error": f"HTTP error {resp.status_code}"}
-            except Exception:
-                # If network fails midway, fallback to in-process FastMCP dispatch
-                use_http = False
-
-        if not use_http:
-            # FastMCP In-Process tool execution
-            if tool_name not in TOOL_MAP:
+        # Execute via stdio transport using MultiServerMCPClient tools
+        try:
+            lc_tools = self.get_langchain_tools()
+            target_tool = next((t for t in lc_tools if t.name == tool_name), None)
+            if target_tool:
+                raw_res = target_tool.invoke(arguments)
+                result = self._extract_tool_result(raw_res)
+            elif tool_name in TOOL_MAP:
+                result = TOOL_MAP[tool_name](**arguments)
+            else:
                 result = {"error": f"Tool '{tool_name}' not found in MCP registry"}
                 status = "error"
-            else:
+        except Exception as e:
+            # Fallback to direct tool execution if subprocess stdio encounters unexpected error
+            if tool_name in TOOL_MAP:
                 try:
                     result = TOOL_MAP[tool_name](**arguments)
-                except Exception as e:
-                    result = {"error": f"Tool execution failed: {str(e)}"}
+                except Exception as inner_e:
+                    result = {"error": f"Tool execution failed: {str(inner_e)}"}
                     status = "error"
+            else:
+                result = {"error": f"Tool execution failed: {str(e)}"}
+                status = "error"
 
         # Check action safety guardrail status
         if isinstance(result, dict) and result.get("status") == "CONFIRMATION_REQUIRED":
@@ -256,7 +258,7 @@ class MCPClient:
         }
 
     async def acall_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Asynchronous execution of an MCP tool using MultiServerMCPClient."""
+        """Asynchronous execution of an MCP tool using MultiServerMCPClient over stdio."""
         start_time = time.perf_counter()
         status = "success"
         try:
@@ -264,20 +266,22 @@ class MCPClient:
             target_tool = next((t for t in tools if t.name == tool_name), None)
             if target_tool:
                 raw = await target_tool.ainvoke(arguments)
-                # Parse LangChain text content
-                result = raw
-                if isinstance(raw, list) and len(raw) > 0:
-                    first = raw[0]
-                    text_val = first.get("text") if isinstance(first, dict) else getattr(first, "text", None)
-                    if text_val:
-                        try:
-                            result = json.loads(text_val)
-                        except Exception:
-                            result = text_val
-            else:
+                result = self._extract_tool_result(raw)
+            elif tool_name in TOOL_MAP:
                 result = TOOL_MAP[tool_name](**arguments)
-        except Exception:
-            result = TOOL_MAP[tool_name](**arguments)
+            else:
+                result = {"error": f"Tool '{tool_name}' not found in MCP registry"}
+                status = "error"
+        except Exception as e:
+            if tool_name in TOOL_MAP:
+                try:
+                    result = TOOL_MAP[tool_name](**arguments)
+                except Exception as inner_e:
+                    result = {"error": f"Tool execution failed: {str(inner_e)}"}
+                    status = "error"
+            else:
+                result = {"error": f"Tool execution failed: {str(e)}"}
+                status = "error"
 
         if isinstance(result, dict) and result.get("status") == "CONFIRMATION_REQUIRED":
             status = "confirmation_required"

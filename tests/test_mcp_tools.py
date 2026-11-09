@@ -3,7 +3,7 @@ from src.mcp.client import MCPClient
 
 @pytest.fixture
 def mcp_client():
-    return MCPClient(prefer_http=False)
+    return MCPClient()
 
 def test_mcp_tool_discovery(mcp_client):
     tools = mcp_client.list_tools()
@@ -96,6 +96,7 @@ def test_fastmcp_tool_decorations():
 def test_multiserver_mcp_client_integration(mcp_client):
     assert hasattr(mcp_client, "multi_server_client")
     assert "hr_mcp_server" in mcp_client.connections
+    assert mcp_client.connections["hr_mcp_server"]["transport"] == "stdio"
     lc_tools = mcp_client.get_langchain_tools()
     assert len(lc_tools) >= 8
     tool_map = {t.name: t for t in lc_tools}

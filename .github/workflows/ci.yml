@@ -41,7 +41,7 @@ jobs:
       run: |
         python -c "
         from src.mcp.client import MCPClient
-        client = MCPClient(prefer_http=False)
+        client = MCPClient()
         tools = client.list_tools()
         assert len(tools) >= 5, f'Expected at least 5 tools, found {len(tools)}'
         print(f'Successfully verified {len(tools)} MCP tools!')

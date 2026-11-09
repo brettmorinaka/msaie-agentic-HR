@@ -24,8 +24,8 @@ This document details the AI-assisted engineering tools utilized during the desi
 
 ### 2.2 Model Context Protocol (MCP) with FastMCP & langchain-mcp-adapters
 - **Application:** Refactored tool definitions using **FastMCP** (`mcp.server.fastmcp`) with `@mcp.tool()` decorators in `src/mcp/tools.py`.
-- **Client Integration:** Implemented **langchain-mcp-adapters** and **MultiServerMCPClient** (`src/mcp/client.py`), allowing seamless tool discovery and LangChain `BaseTool` conversion across SSE, Stdio, and in-process execution.
-- **Dual Transport Integration:** Implemented FastMCP SSE mounting (`/sse`, `/messages`) and standalone stdio subprocess execution (`python -m src.mcp.server --stdio`) with full operational telemetry (tool arguments, return values, and latency).
+- **Client Integration:** Implemented **langchain-mcp-adapters** and **MultiServerMCPClient** (`src/mcp/client.py`), allowing seamless tool discovery and LangChain `BaseTool` conversion using **Standard I/O (stdio) transport**.
+- **Stdio Transport Integration:** Implemented FastMCP stdio subprocess execution (`python -m src.mcp.server`) with full operational telemetry (tool arguments, return values, and latency), eliminating external network port binding.
 
 ### 2.3 LangGraph Multi-Agent Orchestration & Dynamic LLM Intent Classification
 - **Application:** Structured the `StateGraph` state machine (`src/agents/orchestrator.py`) using a centralized `HRAgentState` TypedDict.
@@ -133,7 +133,8 @@ Reviewing the code lifecycle and the series of commits from today reveals severa
 - **Resolution:**
   - Updated documentation (`deployed.md`, `README.md`) to explicitly delineate service availability:
     - **Deployed URL:** Dedicated exclusively to the interactive Streamlit UI.
-    - **Local Deployment (`./run.sh`):** Exposes the full multi-service architecture including the FastAPI REST endpoints (`/health`, `/chat`, `/docs`) and the FastMCP server (`/mcp`).
+    - **MCP Transport:** Runs as a dedicated Standard I/O (`stdio`) subprocess pipeline managed by `MultiServerMCPClient`, eliminating the port 8001 microservice and socket conflicts entirely.
+    - **Local Deployment (`./run.sh`):** Exposes the FastAPI REST endpoints (`/health`, `/chat`, `/docs`) and Streamlit web app, with MCP running via stdio.
   - Documented free-tier dormancy characteristics (50–90 second spin-up delay) and mitigation strategies (uptime pingers or local execution).
 
 ### 4.7 Streamlit Re-Import Caching Crash (Empty DOM Bug)

@@ -19,8 +19,8 @@ COPY . .
 # Ingest policy documents into ChromaDB
 RUN python src/rag/ingest.py
 
-# Expose ports for Streamlit (8501) and API/MCP (8000)
-EXPOSE 8501 8000 8001
+# Expose ports for Streamlit (8501) and API (8000)
+EXPOSE 8501 8000
 
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8501

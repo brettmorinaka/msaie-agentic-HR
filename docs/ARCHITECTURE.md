@@ -22,7 +22,7 @@ flowchart TD
 
     subgraph MCP ["MCP Protocol Layer"]
         I[MCP Client Wrapper]
-        J[MCP Server :8001 / JSON-RPC]
+        J[FastMCP Server / stdio Subprocess]
     end
 
     subgraph Tools ["MCP Tools (8 Registered Tools)"]
@@ -83,10 +83,11 @@ flowchart TD
 * **Justification:** LangGraph provides deterministic cyclical and conditional graph topologies with strong type safety (`HRAgentState`). It enables clear separation between **intent routing**, **pre-execution guardrails**, **specialized domain agents**, and **post-execution synthesis/citation auditing**.
 
 ### 2.2 MCP Server & Transport Architecture
-* **Choice:** Model Context Protocol (MCP) server with **Streamable HTTP / JSON-RPC 2.0 transport** and an in-process local transport fallback.
+* **Choice:** Model Context Protocol (MCP) server using **Standard I/O (`stdio`) transport** (`python -m src.mcp.server`).
 * **Justification:** 
-  - Meets requirement 5 by wrapping all tool invocations inside the formal MCP layer (`tools/list` and `tools/call`).
-  - Supports both **distributed multi-service deployment** (MCP running as a standalone HTTP microservice on `:8001`) and **single-service container deployment** (running in-process or sidecar) without code changes.
+  - Meets requirement 5 by wrapping all tool invocations inside the formal MCP specification (`tools/list` and `tools/call`) using `FastMCP` and `langchain-mcp-adapters` (`MultiServerMCPClient`).
+  - Standard I/O (`stdio`) subprocess execution eliminates network socket binding and port conflicts (e.g., removing the requirement for a separate standalone HTTP service on port `:8001`). This simplifies single-port containerized cloud deployments (such as Render or Docker) while maintaining complete process isolation and zero network attack surface.
+  - Operational telemetry captures every tool call's name, arguments, structured output, execution status, and latency over the standard I/O pipe.
 
 ### 2.3 Policy Ingestion, Parsing & Chunking Strategy
 * **Choice:** Multi-format parser (`.md`, `.html`, `.txt`) with **Heading-Aware Semantic Chunking** (`HeadingAwareChunker`, max 250 words, 40-word overlap).

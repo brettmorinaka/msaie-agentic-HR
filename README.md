@@ -33,7 +33,7 @@ An autonomous, multi-agent Human Resources automation system built with **LangGr
 
 2. **Model Context Protocol (MCP) Integration:**
    - 8 fully registered MCP tools built using **FastMCP** (`mcp.server.fastmcp`) with `@mcp.tool()` decorators.
-   - Client connectivity and LangChain tool conversion powered by **langchain-mcp-adapters** and **MultiServerMCPClient**, supporting SSE, Stdio, and in-process execution.
+   - Client connectivity and LangChain tool conversion powered by **langchain-mcp-adapters** and **MultiServerMCPClient** using **Standard I/O (stdio) transport** (`python -m src.mcp.server`).
    - The agent invokes all tools exclusively through the MCP client layer with full operational telemetry (arguments, outputs, latency).
 
 3. **Action Safety Guardrails:**
@@ -72,7 +72,7 @@ msaie-agentic-HR/
 │   │   └── ingest.py               # Document ingestion & indexing CLI
 │   ├── mcp/
 │   │   ├── tools.py                # 8 MCP tools implementation & schemas
-│   │   ├── server.py               # FastAPI MCP JSON-RPC 2.0 / HTTP server
+│   │   ├── server.py               # FastMCP Server (stdio transport runner)
 │   │   └── client.py               # MCP client wrapper & operational telemetry
 │   ├── agents/
 │   │   ├── state.py                # LangGraph HRAgentState TypedDict
@@ -134,7 +134,7 @@ python src/rag/ingest.py
 ## 💻 Running the Application
 
 ### Option A: All-in-One Startup Script (Recommended)
-Launch the MCP server, FastAPI backend, and Streamlit web app simultaneously:
+Launch the FastAPI backend and Streamlit web app simultaneously (MCP Server is automatically managed as a stdio subprocess by the application):
 ```bash
 ./run.sh
 ```
@@ -144,9 +144,10 @@ Open **http://localhost:8501** in your browser.
 
 ### Option B: Running Individual Services Manually
 
-**1. Start the MCP Server (Port 8001):**
+**1. Test / Run the FastMCP Server (stdio Transport):**
+The MCP server communicates via stdio pipes (`sys.stdin` / `sys.stdout`), spawned automatically by `MultiServerMCPClient`. You can verify or run it directly:
 ```bash
-python src/mcp/server.py
+python -m src.mcp.server
 ```
 
 **2. Start the FastAPI Backend (Port 8000):**
