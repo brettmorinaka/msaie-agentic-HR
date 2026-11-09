@@ -26,9 +26,7 @@ if [ ! -d "chroma_db" ]; then
     python src/rag/ingest.py
 fi
 
-echo "[*] Starting MCP Server in background on port 8001..."
-python src/mcp/server.py &
-MCP_PID=$!
+echo "[*] MCP Transport configured to stdio (managed as subprocess by MCPClient)."
 
 echo "[*] Starting FastAPI Backend on port 8000..."
 python src/api/server.py &
@@ -37,7 +35,6 @@ API_PID=$!
 echo "[*] Starting Streamlit Web Application on port 8501..."
 cleanup() {
     echo -e "\n[*] Shutting down HR Multi-Agent services..."
-    kill $MCP_PID 2>/dev/null || true
     kill $API_PID 2>/dev/null || true
     exit 0
 }

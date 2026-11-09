@@ -28,7 +28,7 @@ flowchart TD
 
     subgraph MCP ["Model Context Protocol (MCP) Layer"]
         I[MCP Client Wrapper & Telemetry]
-        J[MCP Server :8001 / JSON-RPC 2.0 & HTTP]
+        J[FastMCP Server / stdio Subprocess]
     end
 
     subgraph Tools ["MCP Tools (8 Registered Tools)"]
@@ -91,7 +91,7 @@ flowchart TD
 3. **LangGraph StateGraph Orchestrator (`src/agents/orchestrator.py`):**
    - Coordinates cyclical and conditional agent execution through a strongly typed state schema (`HRAgentState`).
 4. **Model Context Protocol Layer (`src/mcp/`):**
-   - Implements 8 standardized tools exposed over JSON-RPC 2.0 and Streamable HTTP on port `8001` with client-side telemetry logging.
+   - Implements 8 standardized tools exposed over Standard I/O (`stdio`) transport via FastMCP and `MultiServerMCPClient` with client-side telemetry logging.
 5. **ChromaDB Local Vector Store (`src/rag/vector_store.py`):**
    - On-disk persistent vector database storing 37 semantic chunks across 5 corporate policy documents.
 6. **Unified LLM Provider Engine (`src/agents/llm_provider.py`):**
@@ -143,11 +143,11 @@ To solve this, `HeadingAwareChunker` (`src/rag/chunker.py`) uses regex-based sec
 The MCP subsystem adheres to the standard Model Context Protocol using **FastMCP** (`mcp.server.fastmcp`) and **langchain-mcp-adapters** (`langchain_mcp_adapters`):
 - **Server Framework (`FastMCP`):** `src/mcp/tools.py` defines the MCP server using `FastMCP("HR-Automation-MCP-Server")`.
 - **Tooling Decorators (`@mcp.tool()`):** All 8 tools are explicitly registered using `@mcp.tool()`, generating standard JSON Schemas from Python type annotations and docstrings while remaining directly invokable.
-- **Client Framework (`MultiServerMCPClient`):** `MCPClient` (`src/mcp/client.py`) incorporates `langchain_mcp_adapters.client.MultiServerMCPClient`, supporting multi-server connection management across SSE, Stdio, and in-process execution.
-- **Transports Supported:**
-  - **SSE Transport:** FastMCP Server mounts `mcp.sse_app()` at `/sse` on `http://localhost:8001/sse` for streaming client sessions.
-  - **Stdio Transport:** Run via `python -m src.mcp.server --stdio` for headless subprocess communication with `MultiServerMCPClient`.
-  - **JSON-RPC REST Fallback:** `/mcp` and `/mcp/call` provide backward-compatible JSON-RPC 2.0 dispatch.
+- **Client Framework (`MultiServerMCPClient`):** `MCPClient` (`src/mcp/client.py`) incorporates `langchain_mcp_adapters.client.MultiServerMCPClient`, managing a subprocess connection over standard I/O streams (`sys.stdin` / `sys.stdout`).
+- **Transport Architecture (`stdio`):**
+  - **Stdio Transport:** Run via `python -m src.mcp.server` as a managed subprocess using `MultiServerMCPClient`.
+  - **Zero Network Overhead:** Eliminates HTTP socket binding, port conflict issues, and multi-port container restrictions (such as Render's single-port limitation).
+  - **Formal Protocol Compliance:** Implements official MCP JSON-RPC 2.0 requests (`initialize`, `tools/list`, and `tools/call`) over standard streams.
 - **LangChain Tool Integration:** `MCPClient.get_langchain_tools()` dynamically retrieves converted LangChain `BaseTool` / `StructuredTool` instances, supporting both synchronous `invoke()` and asynchronous `ainvoke()`.
 
 ### 3.2 Operational Telemetry Trace
@@ -338,7 +338,7 @@ The architecture incorporates three distinct layers of guardrails (`src/agents/g
 | :--- | :--- | :--- |
 | **Hosting Platform** | Render.com / Railway | Offers zero-cost hosting tiers, native Git integration, and environment variable management. |
 | **Containerization** | Multi-stage `Dockerfile` (Python 3.12-slim) | Guarantees identical execution between local development and cloud host; pre-indexes vector store during image build. |
-| **Service Topology** | Unified single-container service (Default) with optional standalone MCP service | Free-tier platforms enforce a 1-service free limit. The unified container runs the Streamlit UI on `$PORT` (8501) with background FastAPI REST and MCP client in-process, meeting all requirements without requiring multi-service paid subscriptions. |
+| **Service Topology** | Single-container service with stdio MCP | Free-tier platforms enforce a 1-service free limit. The container runs the Streamlit UI on `$PORT` (8501) with background FastAPI REST and an MCP server executing via stdio subprocess transport, meeting all requirements without requiring multi-service paid subscriptions or port conflicts. |
 | **Database Storage** | Persistent local ChromaDB + JSON data files | Zero cloud database hosting costs, zero network latency, and complete portability. |
 | **Cold-Start Handling** | Lightweight fallback embeddings | On free tiers that sleep after 15 minutes, container wake-up takes ~50-90s, but internal Python cold-start takes only **~88 ms** because no multi-gigabyte models are downloaded dynamically. |
 

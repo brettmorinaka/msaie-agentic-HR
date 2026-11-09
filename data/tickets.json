@@ -150,5 +150,55 @@
     "status": "PENDING_MANAGER_APPROVAL",
     "created_at": "2026-10-04T22:32:39.774589+00:00",
     "action_safety": "MOCK_EXECUTED"
+  },
+  {
+    "ticket_id": "TCK-1016",
+    "employee_id": "EMP-101",
+    "employee_name": "Alice Chen",
+    "ticket_type": "Equipment Stipend",
+    "details": "Ergonomic chair request ($350)",
+    "status": "PENDING_MANAGER_APPROVAL",
+    "created_at": "2026-10-05T05:51:21.243387+00:00",
+    "action_safety": "MOCK_EXECUTED"
+  },
+  {
+    "ticket_id": "TCK-1017",
+    "employee_id": "EMP-101",
+    "employee_name": "Alice Chen",
+    "ticket_type": "Equipment Stipend",
+    "details": "Ergonomic chair request ($350)",
+    "status": "PENDING_MANAGER_APPROVAL",
+    "created_at": "2026-11-09T00:34:05.573719+00:00",
+    "action_safety": "MOCK_EXECUTED"
+  },
+  {
+    "ticket_id": "TCK-1018",
+    "employee_id": "EMP-101",
+    "employee_name": "Alice Chen",
+    "ticket_type": "Equipment Stipend",
+    "details": "Ergonomic chair request ($350)",
+    "status": "PENDING_MANAGER_APPROVAL",
+    "created_at": "2026-11-09T00:38:15.346180+00:00",
+    "action_safety": "MOCK_EXECUTED"
+  },
+  {
+    "ticket_id": "TCK-1019",
+    "employee_id": "EMP-101",
+    "employee_name": "Alice Chen",
+    "ticket_type": "Equipment Stipend",
+    "details": "Ergonomic chair request ($350)",
+    "status": "PENDING_MANAGER_APPROVAL",
+    "created_at": "2026-11-09T00:38:54.268679+00:00",
+    "action_safety": "MOCK_EXECUTED"
+  },
+  {
+    "ticket_id": "TCK-1020",
+    "employee_id": "EMP-101",
+    "employee_name": "Alice Chen",
+    "ticket_type": "Equipment Stipend",
+    "details": "Ergonomic chair request ($350)",
+    "status": "PENDING_MANAGER_APPROVAL",
+    "created_at": "2026-11-09T00:42:58.639060+00:00",
+    "action_safety": "MOCK_EXECUTED"
   }
 ]

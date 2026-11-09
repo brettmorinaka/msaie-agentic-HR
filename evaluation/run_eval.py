@@ -146,7 +146,7 @@ def run_evaluation() -> Dict[str, Any]:
     ablation_k2_lats = []
     ablation_k5_lats = []
 
-    mcp_test = MCPClient(prefer_http=False)
+    mcp_test = MCPClient()
     sample_queries = [d["query"] for d in dataset if d["category"] in ["straightforward_policy", "multi_document_rag"]]
     for q in sample_queries[:5]:
         # k=2

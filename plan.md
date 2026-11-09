@@ -38,7 +38,7 @@
 7. Deployment to Render, Railway, or Equivalent
     - Deploy the application to Render, Railway, or an equivalent free-tier or zero-cost host. The deployed application must be accessible at a shareable URL unless the student documents a platform outage or exceptional deployment issue.
     - To remain free-tier compatible, a single-service deployment is acceptable: the web app, agent orchestrator, local vector store, mock JSON data, and MCP server process may all run in one deployed service.
-    - Deploy the MCP server as a separate service and call it via HTTP. Configure the MCP server URL with environment variables.
+    - Run the MCP server via Standard I/O (stdio) transport as a managed subprocess using `MultiServerMCPClient`, configured via environment variables (`MCP_TRANSPORT=stdio`).
     - The application should not require a paid database. Acceptable storage includes committed synthetic data files or a hosted free-tier option.
     - If the free-tier service spins down after inactivity, the README and demo should explain the expected cold-start behavior.
 8. CI/CD

@@ -12,7 +12,6 @@ sys.path.insert(0, str(ROOT_DIR))
 from src.config import API_HOST, API_PORT, CHROMA_PERSIST_DIR
 from src.agents.orchestrator import HROrchestrator
 from src.mcp.client import MCPClient
-from src.mcp.server import app as mcp_app
 from src.rag.vector_store import PolicyVectorStore
 
 app = FastAPI(
@@ -64,7 +63,7 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "hr-agentic-rag-system",
-        "mcp_server_status": "connected_http" if is_mcp_live else "in_process_active",
+        "mcp_server_status": "connected_stdio" if is_mcp_live else "in_process_active",
         "vector_store_chunks": chunks_count,
         "supported_workflows": [
             "policy_rag",
@@ -95,9 +94,6 @@ async def chat_endpoint(request: ChatRequest):
         return ChatResponse(**result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Orchestrator error: {str(e)}")
-
-# Mount MCP sub-routes for unified single-service deployments
-app.mount("/mcp-service", mcp_app)
 
 def start():
     uvicorn.run("src.api.server:app", host=API_HOST, port=API_PORT, reload=False)

@@ -12,11 +12,9 @@ EMPLOYEES_FILE = DATA_DIR / "employees.json"
 TICKETS_FILE = DATA_DIR / "tickets.json"
 CHROMA_PERSIST_DIR = Path(os.getenv("CHROMA_PERSIST_DIR", str(BASE_DIR / "chroma_db")))
 
-# MCP Configuration
-MCP_SERVER_HOST = os.getenv("MCP_SERVER_HOST", "0.0.0.0")
-MCP_SERVER_PORT = int(os.getenv("MCP_SERVER_PORT", "8001"))
-MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", f"http://localhost:{MCP_SERVER_PORT}/mcp")
-MCP_TRANSPORT = os.getenv("MCP_TRANSPORT", "http")
+# MCP Configuration - Standard I/O (stdio) Transport
+MCP_TRANSPORT = os.getenv("MCP_TRANSPORT", "stdio")
+MCP_SERVER_COMMAND = os.getenv("MCP_SERVER_COMMAND", "python -m src.mcp.server")
 
 # API Configuration
 API_HOST = os.getenv("API_HOST", "0.0.0.0")

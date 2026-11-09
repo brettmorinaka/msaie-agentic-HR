@@ -15,20 +15,4 @@ services:
       - key: LLM_MODEL
         value: openai/gpt-4o-mini
       - key: MCP_TRANSPORT
-        value: http
-      - key: MCP_SERVER_URL
-        value: http://localhost:8001/mcp
-
-  # Standalone MCP Tool Server (Optional separate service per Requirement 7)
-  - type: web
-    name: hr-mcp-tool-server
-    env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python src/mcp/server.py"
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.12.0
-      - key: MCP_SERVER_HOST
-        value: 0.0.0.0
-      - key: MCP_SERVER_PORT
-        value: 8001
+        value: stdio

@@ -20,7 +20,7 @@ This document provides deployment URLs, health endpoints, container execution de
 | **Service Health Check Endpoint (`/health`)** | *N/A (Returns Streamlit app)* | [http://localhost:8000/health](http://localhost:8000/health) | **Local Deployment Only**. FastAPI JSON endpoint returning system status, vector store chunk count (152 chunks), and MCP connectivity. |
 | **Chat & Multi-Agent API Endpoint (`/chat`)** | *N/A (Returns Streamlit app)* | [http://localhost:8000/chat](http://localhost:8000/chat) | **Local Deployment Only**. FastAPI `POST` endpoint accepting user inquiries and returning answers, citations, and MCP tool traces. |
 | **Interactive API Documentation (`/docs`)** | *N/A (Returns Streamlit app)* | [http://localhost:8000/docs](http://localhost:8000/docs) | **Local Deployment Only**. Swagger UI for interactive inspection of REST API endpoints. |
-| **MCP Tool Server (`/mcp`)** | *N/A (Returns Streamlit app)* | [http://localhost:8001/mcp](http://localhost:8001/mcp) | **Local Deployment Only**. FastMCP JSON-RPC / Streamable HTTP endpoint for the registered MCP tools. |
+| **MCP Tool Server** | *Internal Subprocess (stdio)* | `python -m src.mcp.server` | **Available Deployed & Locally**. FastMCP Standard I/O (`stdio`) subprocess runner communicating via `MultiServerMCPClient`. Requires no network port. |
 
 ---
 
@@ -38,7 +38,7 @@ curl -X GET http://localhost:8000/health
 {
   "status": "healthy",
   "service": "hr-agentic-rag-system",
-  "mcp_server_status": "connected_http",
+  "mcp_server_status": "connected_stdio",
   "vector_store_chunks": 152,
   "supported_workflows": [
     "policy_rag",
@@ -78,9 +78,9 @@ To run both the Streamlit UI and the backend API services without free-tier cold
 ./run.sh
 ```
 This script launches:
-1. **FastMCP Server** on port `8001` (`http://localhost:8001/mcp`)
-2. **FastAPI Backend** on port `8000` (`http://localhost:8000/health`, `http://localhost:8000/chat`, `http://localhost:8000/docs`)
-3. **Streamlit Web Application** on port `8501` (`http://localhost:8501`)
+1. **FastAPI Backend** on port `8000` (`http://localhost:8000/health`, `http://localhost:8000/chat`, `http://localhost:8000/docs`)
+2. **Streamlit Web Application** on port `8501` (`http://localhost:8501`)
+3. **MCP Tool Server** running automatically via Standard I/O (`stdio`) subprocess pipeline.
 
 ---
 
